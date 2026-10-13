@@ -15,4 +15,11 @@ export class ApiBaseService {
   post<T>(path: string, body: unknown): Observable<T> { return this.http.post<T>(`${API_BASE}${path}`, body); }
   put<T>(path: string, body: unknown): Observable<T> { return this.http.put<T>(`${API_BASE}${path}`, body); }
   delete<T>(path: string): Observable<T> { return this.http.delete<T>(`${API_BASE}${path}`); }
+  postFile<T>(path: string, file: File): Observable<T> { const body = new FormData(); body.append('file', file); return this.http.post<T>(`${API_BASE}${path}`, body); }
+  download(path: string, params?: Record<string, string | number | undefined>): Observable<Blob> {
+    let query = new HttpParams();
+    for (const [key, value] of Object.entries(params ?? {})) if (value !== undefined && value !== '') query = query.set(key, value);
+    return this.http.get(`${API_BASE}${path}`, { params: query, responseType: 'blob' });
+  }
+  downloadFile(path: string): Observable<Blob> { return this.http.get(`${API_BASE}${path}`, { responseType: 'blob' }); }
 }

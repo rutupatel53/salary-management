@@ -12,6 +12,7 @@ import java.util.TreeMap;
 public class GlobalExceptionHandler {
  @ExceptionHandler(NotFoundException.class) ResponseEntity<?> notFound(RuntimeException e){return ResponseEntity.status(404).body(Map.of("message",e.getMessage(),"errors",Map.of()));}
  @ExceptionHandler(ConflictException.class) ResponseEntity<?> conflict(RuntimeException e){return ResponseEntity.status(409).body(Map.of("message",e.getMessage(),"errors",Map.of()));}
+ @ExceptionHandler(ImportValidationException.class) ResponseEntity<?> importValidation(ImportValidationException e){return ResponseEntity.badRequest().body(Map.of("message",e.getMessage(),"data",e.getPreview()));}
  @ExceptionHandler(MethodArgumentNotValidException.class) ResponseEntity<?> invalid(MethodArgumentNotValidException e){
   Map<String,String> errors=new TreeMap<>(); e.getBindingResult().getFieldErrors().forEach(x->errors.putIfAbsent(x.getField(),x.getDefaultMessage()));
   return ResponseEntity.badRequest().body(Map.of("message","Please correct the highlighted fields.","errors",errors));

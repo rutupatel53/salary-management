@@ -4,5 +4,6 @@ export const appRoutes: Routes = [
  { path: 'employees', loadComponent: () => import('./features/employees/employees.component').then(m => m.EmployeesComponent) },
  { path: 'employees/:id', loadComponent: () => import('./features/employees/employee-detail.component').then(m => m.EmployeeDetailComponent) },
  { path: 'insights', loadComponent: () => import('./features/insights/insights.component').then(m => m.InsightsComponent) },
+ { path: 'import-export', loadComponent: () => import('./features/import-export/import-export.component').then(m => m.ImportExportComponent) },
  { path: '**', redirectTo: 'employees' }
 ];
