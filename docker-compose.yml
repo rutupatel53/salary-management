@@ -1,0 +1,30 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: salary_management
+      POSTGRES_USER: salary
+      POSTGRES_PASSWORD: salary
+    ports:
+      - "5432:5432"
+    volumes:
+      - salary_postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U salary -d salary_management"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  salary-api:
+    build: ./backend
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/salary_management
+      SPRING_DATASOURCE_USERNAME: salary
+      SPRING_DATASOURCE_PASSWORD: salary
+      PORT: 8080
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+volumes:
+  salary_postgres:

@@ -5,6 +5,12 @@ data/
 *.mv.db
 *.trace.db
 .angular/
+**/.m2/
+**/playwright-report/
+**/test-results/
+**/allure-results/
+**/allure-report/
+e2e/reports/
 .env
 .env.*
 !.env.example
