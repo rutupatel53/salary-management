@@ -7,7 +7,7 @@ An HR salary-management web app for 10,000 fictional employees across five count
 - Java 17, Spring Boot, Spring Data JPA, Flyway, PostgreSQL
 - Angular standalone, Angular Material, strict TypeScript
 - Playwright with TypeScript for end-to-end tests
-- Docker Compose for local PostgreSQL
+- PostgreSQL 16 for local, CI, and Render databases, with Docker Compose for local setup
 - Render for API/PostgreSQL and Netlify for the Angular app; their GitHub integrations auto-deploy. GitHub Actions runs tests only.
 
 ## Product modules
@@ -34,13 +34,7 @@ Use Docker Compose to run PostgreSQL, the API, and Angular UI:
 docker compose up --build
 ```
 
-Open `http://localhost:4200`; the API health route is `http://localhost:8080/api/health`. Flyway creates the schema and reference rows at startup. To load the deterministic 10,000-person dataset after the database is ready, run:
-
-```sh
-docker compose run --rm -e APP_SEED_ENABLED=true -e SPRING_MAIN_WEB_APPLICATION_TYPE=none salary-api
-```
-
-The seed uses synthetic data only. The smaller Playwright dataset remains separate.
+Open `http://localhost:4200`; the API health route is `http://localhost:8080/api/health`. Flyway creates the schema and reference rows, then Compose loads the deterministic 10,000-person synthetic dataset. The smaller Playwright fixture set remains separate and its reset endpoint is available only in this local setup.
 
 ## Tests
 
@@ -59,6 +53,13 @@ npm run test:all
 ```
 
 `test:all` prints counts and failed-test reasons, writes Playwright HTML and JUnit XML, and creates `e2e/reports/detailed-report.html`. `report:open` opens the full Playwright report. The local test reset endpoint is enabled only by Docker Compose; production keeps it disabled. Run `npm run perf:check` in `/e2e` after loading the seed to save PostgreSQL query plans.
+
+If Java or Node is not installed locally, run the unit checks through the versioned container targets from the repository root:
+
+```sh
+docker build --target unit-tests -f backend/Dockerfile backend
+docker build --target unit-tests -f frontend/Dockerfile frontend
+```
 
 ## Deployment
 

@@ -1,5 +1,6 @@
 databases:
   - name: salary-management-db
+    postgresMajorVersion: '16'
     databaseName: salary_management
     user: salary
     plan: free

@@ -45,7 +45,7 @@ jobs:
     needs: [backend, frontend]
     services:
       postgres:
-        image: postgres:17-alpine
+        image: postgres:16-alpine
         env:
           POSTGRES_DB: salary_management
           POSTGRES_USER: salary
@@ -86,7 +86,7 @@ jobs:
           nohup mvn -q -f backend/pom.xml spring-boot:run > /tmp/salary-api.log 2>&1 &
           curl --fail --retry 90 --retry-delay 2 --retry-connrefused http://127.0.0.1:8080/api/health
           for attempt in $(seq 1 180); do
-            total=$(curl -fsS 'http://127.0.0.1:8080/api/employees?q=ACME-&page=0&size=1' | jq -r '.totalItems' || echo 0)
+            total=$(curl -fsS 'http://127.0.0.1:8080/api/employees?q=ACME-&page=0&size=1' | jq -r '.data.totalItems' || echo 0)
             [ "$total" = "10000" ] && exit 0
             sleep 2
           done

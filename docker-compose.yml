@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:17-alpine
+    image: postgres:16-alpine
     environment:
       POSTGRES_DB: salary_management
       POSTGRES_USER: salary
@@ -20,6 +20,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/salary_management
       SPRING_DATASOURCE_USERNAME: salary
       SPRING_DATASOURCE_PASSWORD: salary
+      APP_SEED_ENABLED: "true"
       APP_TEST_TOOLS_ENABLED: "true"
       FRONTEND_ORIGIN: "http://127.0.0.1:4200,http://localhost:4200"
       PORT: 8080

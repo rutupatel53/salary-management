@@ -1,12 +1,12 @@
 # Salary Management Assessment: Phased Delivery Plan
 
-**Status:** Execution tracking as of 2026-10-14. Phases 0–6 are implemented and committed. Phase 7 is in progress. Public hosting, the hosted smoke test, and the demo recording still need account access and a running local browser environment.
+**Status:** Execution tracking as of 2026-10-14. Phases 0–7 are implemented and verified locally. Phase 8 is prepared but needs the user's Render, Netlify, and GitHub collaborator access plus a demo recording.
 
 ## Summary
 
 The original delivery estimate was **24 focused hours**, targeting three days at eight hours per day. The user requested completion today, so MUST work takes priority and account-dependent deployment steps are prepared for immediate provisioning. The estimate is a guide, not a claim that deployment or recording is complete.
 
-The stack is Java 17, Spring Boot, Spring Data JPA, Flyway, PostgreSQL, standalone Angular with Angular Material and strict TypeScript, Playwright with TypeScript, and Docker Compose. Keep salary data synthetic. Use one commit per tested vertical slice. Render and Netlify configurations use provider GitHub auto-deploy; GitHub Actions runs tests only.
+The stack is Java 17, Spring Boot, Spring Data JPA, Flyway, PostgreSQL 16, standalone Angular with Angular Material and strict TypeScript, Playwright with TypeScript, and Docker Compose. Keep salary data synthetic. Use one commit per tested vertical slice. Render and Netlify configurations use provider GitHub auto-deploy; GitHub Actions runs tests only.
 
 Confirmed defaults: required employee number, name, work email, hire date, country, department, and job title; US/USD, India/INR, UK/GBP, Germany/EUR, Canada/CAD; gross = basic + allowances; net = gross - deductions; nonnegative inputs with two decimal places and HALF_UP; append-only effective-dated salary snapshots; separate insight groups by currency; IQR outliers grouped by job title + country + currency with at least five salaries; stateless atomic create-only Excel imports; soft archive; and a small deterministic local/test reset dataset.
 
@@ -21,8 +21,8 @@ Confirmed defaults: required employee number, name, work email, hire date, count
 | 4. Deterministic 10,000-person seed | 2 | Phase 3 | Done: `bd9f462` |
 | 5. Pay insights | 2.5 | Phase 4 | Done: `ea3f150` |
 | 6. Excel plus activity | 3.5 | Phases 2 and 3 | Done: `2ba0117`, `bd05935`, navigation fix `8d547ab` |
-| 7. Tests, CI, performance | 2 | Phases 2–6 | In progress; local Docker unavailable; report and CI configuration being completed |
-| 8. Public deployment, demo, submission | 2 | All MUST work | Pending provider login, repository reviewer identity, and browser recording access |
+| 7. Tests, CI, performance | 2 | Phases 2–6 | Implemented; 21 backend tests, 9 frontend tests, 16 Playwright tests pass; PostgreSQL 16 timings saved |
+| 8. Public deployment, demo, submission | 2 | All MUST work | Prepared; waiting for Render/Netlify account access, reviewer identity, and demo recording |
 | **Total** | **24** |  |  |
 
 Day 1 is phases 0–2 (8 h). Day 2 is phases 3–5 plus a 0.5 h schedule buffer (8 h). Day 3 is phases 6–8 (7.5 h) plus a 0.5 h schedule buffer. Phase 1 deploys the thin slice; phase 8 verifies and refreshes the final deployment.
@@ -92,7 +92,7 @@ The initial Angular shell may be incomplete or generated for an unsupported Angu
 
 ### Tasks
 
-1. **[MUST | setup] Establish Spring, PostgreSQL, and Flyway locally.** Configure Java 17, Spring Boot, Spring Data JPA, validation, PostgreSQL driver, Flyway, Docker Compose, environment variables, and health reporting. Create the first migration for countries, departments, and employees. **User sees:** `docker compose up` starts a healthy API and database. **API:** `GET /actuator/health`. **Tables:** `countries`, `departments`, `employees`. **Screen:** Angular app shell with navigation and an empty employee list. **Edge cases:** database unavailable, migration failure, missing/invalid environment variables, timezone-safe `hire_date`, and public health output that does not expose credentials.
+1. **[MUST | setup] Establish Spring, PostgreSQL 16, and Flyway locally.** Configure Java 17, Spring Boot, Spring Data JPA, validation, PostgreSQL driver, Flyway, Docker Compose, environment variables, and health reporting. Create the first migration for countries, departments, and employees. **User sees:** `docker compose up` starts a healthy API, database, and seeded synthetic dataset. **API:** `GET /api/health`. **Tables:** `countries`, `departments`, `employees`. **Screen:** Angular app shell with navigation and the seeded employee list. **Edge cases:** database unavailable, migration failure, missing/invalid environment variables, timezone-safe `hire_date`, and public health output that does not expose credentials.
 2. **[MUST | feature] Ship the first directory slice.** Add a paged `GET /api/employees` response and render its empty state in the Angular Material directory screen. **User sees:** a working Employees page and clear empty/loading/error states. **API:** `GET /api/employees?page=0&size=20`. **Tables:** the Phase 1 three tables. **Screen:** `/employees`. **Edge cases:** empty result, invalid page/size, unavailable API, and no unbounded query.
 3. **[MUST | test] Add the reusable Playwright base and sanity check.** Set base URL/API URL from environment variables with local Compose defaults, use page objects, and create `@sanity` health/home/directory checks. **User sees:** one command can verify the deployed thin slice. **API:** `/actuator/health`, `GET /api/employees`. **Tables/screens:** read-only checks on employee tables and `/employees`. **Edge cases:** app/API unavailable must fail with a clear reason; no fixed sleeps; honor environment URLs.
 4. **[MUST | deployment] Deploy the thin slice.** Deploy Render Postgres and Spring API, publish Angular static files to Netlify, set CORS and environment variables, and verify the public URLs. **User sees:** public home and employee-list routes, even before the full feature set is complete. **API/DB:** health and empty employee list using Render Postgres. **Screen:** `/employees`. **Edge cases:** API cold start, CORS, build path, `/actuator/health` exposure, and no secret checked into Git.

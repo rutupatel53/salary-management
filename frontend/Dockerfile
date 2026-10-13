@@ -7,6 +7,9 @@ ARG NG_APP_API_BASE=/api
 ENV NG_APP_API_BASE=${NG_APP_API_BASE}
 RUN npm run build
 
+FROM build AS unit-tests
+RUN npm test
+
 FROM nginx:1.27-alpine
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /workspace/dist/salary-management/browser /usr/share/nginx/html

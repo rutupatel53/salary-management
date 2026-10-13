@@ -5,6 +5,9 @@ RUN mvn -q -DskipTests dependency:go-offline
 COPY src ./src
 RUN mvn -q -DskipTests package
 
+FROM build AS unit-tests
+RUN mvn -q test
+
 FROM eclipse-temurin:17-jre
 WORKDIR /app
 RUN mkdir -p /app/data && useradd --system --uid 10001 appuser && chown -R appuser:appuser /app

@@ -8,7 +8,7 @@ The seed creates 10,000 employees and 10,000 current salary versions. Employee p
 
 Run `npm run perf:check` from `/e2e` with `DB_URL` pointed at the seeded database. The script writes `e2e/reports/performance-summary.txt` with `EXPLAIN ANALYZE` plans for an active country-filtered employee page, country/currency pay summary, and job-title/country/currency outlier groups. CI uploads this report with the test artifacts.
 
-The local Docker engine was unavailable during implementation, so no local timing numbers are claimed. The first successful GitHub Actions run should be used to review the measured plans. Add indexes only when those plans show a table scan or sort that materially affects the 10,000-row workflows.
+On 2026-10-14, the local PostgreSQL 16.15 Docker database returned 25 employee rows in **1.819 ms**, country/currency aggregates in **24.857 ms**, and outlier groups in **29.732 ms**. The database had 10,000 seeded employees plus six fixed Playwright employees. PostgreSQL used an employee-number index for the paged employee query and sequential scans plus in-memory sorts for the full aggregate queries; their measured memory use stayed below 1 MB. These are local warm-cache timings, not hosted performance guarantees. At this size, they do not justify extra indexes or extensions. Recheck the CI plan artifact after any schema or query change.
 
 ## Indexes already selected
 
