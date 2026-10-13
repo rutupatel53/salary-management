@@ -17,5 +17,5 @@ test('@functional activity feed shows successful salary changes newest first', a
   expect(change.ok()).toBeTruthy();
   const activity = new ActivityPage(page); await activity.open(); await activity.expectLoaded();
   await expect(activity.rows().first()).toContainText('SALARY CHANGED');
-  await expect(activity.rows().first()).toContainText(employee.employeeNumber);
+  await expect(activity.rows().first()).toContainText(employee.id);
 });

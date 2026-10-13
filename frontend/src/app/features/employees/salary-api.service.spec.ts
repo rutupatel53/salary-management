@@ -8,7 +8,8 @@ describe('SalaryApiService',()=>{
  beforeEach(()=>{TestBed.configureTestingModule({providers:[provideHttpClient(),provideHttpClientTesting()]});api=TestBed.inject(SalaryApiService);http=TestBed.inject(HttpTestingController);});
  afterEach(()=>http.verify());
  it('posts each salary version as an append request',()=>{
-  api.append('employee-1',{basic:1000.12,allowances:100,deductions:25,currencyCode:'INR',effectiveDate:'2025-02-01'}).subscribe();
-  const request=http.expectOne('/api/employees/employee-1/salary-history');expect(request.request.method).toBe('POST');expect(request.request.body).toEqual({basic:1000.12,allowances:100,deductions:25,currencyCode:'INR',effectiveDate:'2025-02-01'});request.flush({data:{},message:'Salary version added.'});
+  const body={basic:'1000.12',allowances:'100.00',deductions:'25.00',currencyCode:'INR',effectiveDate:'2025-02-01'};
+  api.append('employee-1',body).subscribe();
+  const request=http.expectOne('/api/employees/employee-1/salary-history');expect(request.request.method).toBe('POST');expect(request.request.body).toEqual(body);request.flush({data:{},message:'Salary version added.'});
  });
 });

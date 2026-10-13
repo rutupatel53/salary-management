@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayOutputStream;
-import java.sql.Date;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -51,9 +50,9 @@ public class EmployeeExportServiceImpl implements EmployeeExportService {
                     row.createCell(4).setCellValue(employee.getHireDate().toString()); row.createCell(5).setCellValue(employee.getCountry().getCode());
                     row.createCell(6).setCellValue(employee.getDepartment().getName()); row.createCell(7).setCellValue(employee.getJobTitle());
                     if (salary != null) {
-                        row.createCell(8).setCellValue(salary.currency()); row.createCell(9).setCellValue(salary.basic().doubleValue());
-                        row.createCell(10).setCellValue(salary.allowances().doubleValue()); row.createCell(11).setCellValue(salary.deductions().doubleValue());
-                        row.createCell(12).setCellValue(salary.gross().doubleValue()); row.createCell(13).setCellValue(salary.net().doubleValue());
+                        row.createCell(8).setCellValue(salary.currency()); row.createCell(9).setCellValue(salary.basic().toPlainString());
+                        row.createCell(10).setCellValue(salary.allowances().toPlainString()); row.createCell(11).setCellValue(salary.deductions().toPlainString());
+                        row.createCell(12).setCellValue(salary.gross().toPlainString()); row.createCell(13).setCellValue(salary.net().toPlainString());
                         row.createCell(14).setCellValue(salary.effective().toString());
                     }
                 }

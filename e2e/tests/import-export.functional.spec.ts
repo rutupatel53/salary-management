@@ -1,6 +1,8 @@
 import { test, expect } from '@playwright/test';
 import { ImportExportPage } from '../pages/import-export.page';
 import path from 'node:path';
+import { readFile } from 'node:fs/promises';
+import { database } from '../support/database';
 
 const apiURL = process.env.API_URL ?? 'http://127.0.0.1:8080/api';
 const validFile = path.join(__dirname, '../fixtures/import-valid.xlsx');
@@ -41,3 +43,14 @@ test('@functional filtered export downloads workbook', async ({ page }) => {
   const download = await downloadPromise;
   expect(download.suggestedFilename()).toBe('salary-management-employees.xlsx');
 });
+
+test('@data confirmed import inserts exactly the rows in the workbook', async ({ request }) => {
+  const content = await readFile(validFile);
+  const response = await request.post(`${apiURL}/imports/confirm`, { multipart: { file: { name: 'import-valid.xlsx', mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', buffer: content } } });
+  expect(response.ok()).toBeTruthy();
+  expect((await response.json()).data.createdRows).toBe(1);
+  const count = await database.query("SELECT count(*)::int AS count FROM employees WHERE employee_number='PW-IMP-101'");
+  expect(count.rows[0].count).toBe(1);
+});
+
+test.afterAll(async () => { await database.end(); });

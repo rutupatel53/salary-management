@@ -2,11 +2,13 @@
   "name": "salary-management-e2e",
   "private": true,
   "scripts": {
-    "test:sanity": "playwright test --grep @sanity",
-    "test:functional": "playwright test --grep @functional",
-    "test:data": "playwright test --grep @data",
-    "test:e2e": "playwright test --grep @e2e",
-    "test:all": "playwright test",
+    "test:sanity": "node scripts/run-suite.mjs sanity",
+    "test:functional": "node scripts/run-suite.mjs functional",
+    "test:data": "node scripts/run-suite.mjs data",
+    "test:e2e": "node scripts/run-suite.mjs e2e",
+    "test:all": "node scripts/run-suite.mjs all",
+    "perf:check": "node scripts/performance-check.mjs",
+    "report:generate": "node scripts/generate-report.mjs",
     "report:open": "playwright show-report reports/html"
   },
   "devDependencies": { "@playwright/test": "1.52.0", "@types/node": "22.15.30", "@types/pg": "8.15.2", "pg": "8.16.3", "typescript": "5.7.3" }

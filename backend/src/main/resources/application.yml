@@ -1,8 +1,12 @@
 spring:
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 6MB
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/salary_management}
-    username: ${SPRING_DATASOURCE_USERNAME:salary}
-    password: ${SPRING_DATASOURCE_PASSWORD:salary}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:salary_management}}
+    username: ${SPRING_DATASOURCE_USERNAME:${DB_USER:salary}}
+    password: ${SPRING_DATASOURCE_PASSWORD:${DB_PASSWORD:salary}}
   jpa:
     hibernate:
       ddl-auto: validate
