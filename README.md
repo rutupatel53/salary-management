@@ -46,6 +46,31 @@ The seed uses synthetic data only. The smaller Playwright dataset remains separa
 
 Backend unit tests use JUnit 5 and Mockito. Angular unit tests use the Angular CLI supported runner. Playwright runs from `/e2e`, with environment variables `BASE_URL` and `API_URL`. CI runs tests and saves reports; deploys are handled by Render and Netlify GitHub auto-deploy.
 
+Install dependencies and run the suites from their project folders:
+
+```sh
+cd backend && mvn test
+cd ../frontend && npm ci && npm test && npm run build
+cd ../e2e && npm ci && npx playwright install chromium
+npm run test:sanity
+npm run test:functional
+DB_URL=postgresql://salary:salary@127.0.0.1:5432/salary_management npm run test:data
+npm run test:all
+```
+
+`test:all` prints counts and failed-test reasons, writes Playwright HTML and JUnit XML, and creates `e2e/reports/detailed-report.html`. `report:open` opens the full Playwright report. The local test reset endpoint is enabled only by Docker Compose; production keeps it disabled. Run `npm run perf:check` in `/e2e` after loading the seed to save PostgreSQL query plans.
+
+## Deployment
+
+Deployment is configured for GitHub auto-deploy. CI is test-only.
+
+1. In Render, create a Blueprint from this repository and apply [`render.yaml`](render.yaml). It creates the `salary-management-api` Docker service and a PostgreSQL database. The service migrates the schema and loads only the deterministic synthetic seed. The test reset endpoint stays disabled.
+2. In Netlify, import this repository as a site. The root [`netlify.toml`](netlify.toml) sets the `frontend` base directory, Node 22.22.3, build command, publish folder, and `/api/*` proxy to Render. Subsequent GitHub pushes auto-deploy through Netlify.
+3. Verify `https://salary-management-api.onrender.com/api/health`, then open the assigned Netlify site and confirm the employee and insights screens load. Check that the seeded employee filter reports exactly 10,000 rows.
+4. The repository is private. Add the assessment reviewer as a GitHub collaborator before sharing the repository URL. Do not add real employee or salary data.
+
+Render's free PostgreSQL tier is temporary and the free API may sleep. Use the published app promptly for the assessment demo; check the current provider limits before provisioning.
+
 ## Submission
 
 The submission includes this repository, a public synthetic-data deployment, test/report artifacts, committed design and AI notes, and a demo video. The repository is private; grant reviewer access before sharing its link.

@@ -1,0 +1,43 @@
+databases:
+  - name: salary-management-db
+    databaseName: salary_management
+    user: salary
+    plan: free
+
+services:
+  - type: web
+    name: salary-management-api
+    runtime: docker
+    rootDir: backend
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    autoDeployTrigger: commit
+    healthCheckPath: /api/health
+    envVars:
+      - key: DB_HOST
+        fromDatabase:
+          name: salary-management-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: salary-management-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: salary-management-db
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: salary-management-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: salary-management-db
+          property: password
+      - key: APP_SEED_ENABLED
+        value: 'true'
+      - key: APP_TEST_TOOLS_ENABLED
+        value: 'false'
+      - key: FRONTEND_ORIGIN
+        value: '*'
