@@ -78,9 +78,9 @@ erDiagram
     EMPLOYEES o|--o{ ACTIVITY_LOG : target_of
 
     COUNTRIES {
-        char2 country_code PK
+        varchar2 country_code PK
         varchar name UK
-        char3 currency_code
+        varchar3 currency_code
     }
     DEPARTMENTS {
         uuid department_id PK
@@ -94,7 +94,7 @@ erDiagram
         varchar last_name
         varchar work_email UK_lowercase
         date hire_date
-        char2 country_code FK
+        varchar2 country_code FK
         uuid department_id FK
         varchar job_title
         timestamptz archived_at
@@ -105,7 +105,7 @@ erDiagram
         uuid salary_version_id PK
         uuid employee_id FK
         date effective_date
-        char3 currency_code
+        varchar3 currency_code
         numeric basic_amount
         numeric allowances_amount
         numeric deductions_amount

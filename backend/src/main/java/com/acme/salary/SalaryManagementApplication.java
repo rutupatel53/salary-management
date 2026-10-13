@@ -13,7 +13,8 @@ public class SalaryManagementApplication {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/api/**").allowedOrigins(System.getenv().getOrDefault("FRONTEND_ORIGIN", "http://localhost:4200"))
+                String[] origins = System.getenv().getOrDefault("FRONTEND_ORIGIN", "http://localhost:4200,http://127.0.0.1:4200").split(",");
+                registry.addMapping("/api/**").allowedOriginPatterns(origins)
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS").allowedHeaders("*");
             }
         };

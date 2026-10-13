@@ -21,6 +21,7 @@ services:
       SPRING_DATASOURCE_USERNAME: salary
       SPRING_DATASOURCE_PASSWORD: salary
       APP_TEST_TOOLS_ENABLED: "true"
+      FRONTEND_ORIGIN: "http://127.0.0.1:4200,http://localhost:4200"
       PORT: 8080
     depends_on:
       postgres:
