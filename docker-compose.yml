@@ -20,6 +20,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/salary_management
       SPRING_DATASOURCE_USERNAME: salary
       SPRING_DATASOURCE_PASSWORD: salary
+      APP_TEST_TOOLS_ENABLED: "true"
       PORT: 8080
     depends_on:
       postgres:

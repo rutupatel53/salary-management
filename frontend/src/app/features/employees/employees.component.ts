@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
@@ -16,7 +17,7 @@ import { NotificationService } from '../../core/notification.service';
 
 @Component({
  selector: 'app-employees', standalone: true,
- imports: [CommonModule, FormsModule, ReactiveFormsModule, MatButtonModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatTableModule, MatPaginatorModule, EmptyStateComponent],
+ imports: [CommonModule, RouterLink, FormsModule, ReactiveFormsModule, MatButtonModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatTableModule, MatPaginatorModule, EmptyStateComponent],
  templateUrl: './employees.component.html', styleUrl: './employees.component.css'
 })
 export class EmployeesComponent implements OnInit {
