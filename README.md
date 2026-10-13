@@ -28,11 +28,23 @@ An HR salary-management web app for 10,000 fictional employees across five count
 
 ## Local development
 
-Run PostgreSQL and the app with Docker Compose. Exact commands and environment variables will be documented with the setup slice. The application uses synthetic data only. The seed command creates exactly 10,000 employees; the smaller Playwright fixture set is separate.
+Use Docker Compose to run PostgreSQL, the API, and Angular UI:
+
+```sh
+docker compose up --build
+```
+
+Open `http://localhost:4200`; the API health route is `http://localhost:8080/api/health`. Flyway creates the schema and reference rows at startup. To load the deterministic 10,000-person dataset after the database is ready, run:
+
+```sh
+docker compose run --rm -e APP_SEED_ENABLED=true -e SPRING_MAIN_WEB_APPLICATION_TYPE=none salary-api
+```
+
+The seed uses synthetic data only. The smaller Playwright dataset remains separate.
 
 ## Tests
 
-Backend unit tests use JUnit 5 and Mockito. Angular unit tests use the Angular CLI supported runner. Playwright scripts cover `@sanity`, `@functional`, `@data`, and (time permitting) `@e2e`. CI runs tests and saves reports; deploys are handled by Render and Netlify GitHub auto-deploy.
+Backend unit tests use JUnit 5 and Mockito. Angular unit tests use the Angular CLI supported runner. Playwright runs from `/e2e`, with environment variables `BASE_URL` and `API_URL`. CI runs tests and saves reports; deploys are handled by Render and Netlify GitHub auto-deploy.
 
 ## Submission
 

@@ -1,0 +1,13 @@
+{
+  "name": "salary-management-e2e",
+  "private": true,
+  "scripts": {
+    "test:sanity": "playwright test --grep @sanity",
+    "test:functional": "playwright test --grep @functional",
+    "test:data": "playwright test --grep @data",
+    "test:e2e": "playwright test --grep @e2e",
+    "test:all": "playwright test",
+    "report:open": "playwright show-report reports/html"
+  },
+  "devDependencies": { "@playwright/test": "1.52.0", "@types/node": "22.15.30", "typescript": "5.7.3" }
+}

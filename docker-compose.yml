@@ -26,5 +26,11 @@ services:
         condition: service_healthy
     ports:
       - "8080:8080"
+  salary-ui:
+    build: ./frontend
+    depends_on:
+      - salary-api
+    ports:
+      - "4200:80"
 volumes:
   salary_postgres:
