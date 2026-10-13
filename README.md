@@ -1,27 +1,39 @@
 # Salary Management Assessment
 
-This repository is being prepared for the salary management take-home assessment. The requirements and architecture are being documented before application code is approved.
+An HR salary-management web app for 10,000 fictional employees across five countries. The approved product scope and system design are in [`docs/requirements.md`](docs/requirements.md) and [`docs/design.md`](docs/design.md). The original assessment is preserved in [`docs/assessment-brief.md`](docs/assessment-brief.md).
+
+## Stack
+
+- Java 17, Spring Boot, Spring Data JPA, Flyway, PostgreSQL
+- Angular standalone, Angular Material, strict TypeScript
+- Playwright with TypeScript for end-to-end tests
+- Docker Compose for local PostgreSQL
+- Render for API/PostgreSQL and Netlify for the Angular app; their GitHub integrations auto-deploy. GitHub Actions runs tests only.
+
+## Product modules
+
+1. Employee, department, and country directory
+2. Salary structures and append-only effective-dated history
+3. Stateless Excel preview/validation, atomic create-only import, and filtered export
+4. Currency-separated pay insights and role outliers
+5. Read-only activity log
 
 ## Start here
 
-1. Read [`requirements.md`](requirements.md).
-2. Review the architecture draft in [`docs/architecture.md`](docs/architecture.md).
-3. Check confirmed decisions and open questions in [`docs/decisions.md`](docs/decisions.md).
-4. Follow [`AGENTS.md`](AGENTS.md) when using Codex.
-5. See [`docs/commit-plan.md`](docs/commit-plan.md) for the planned history.
-6. Keep AI task notes under [`ai/`](ai/README.md).
+1. Read [`docs/requirements.md`](docs/requirements.md).
+2. Read the approved architecture, schema, API, UI flows, and trade-offs in [`docs/design.md`](docs/design.md).
+3. Follow [`AGENTS.md`](AGENTS.md) for source layout and engineering rules.
+4. Keep decisions and build notes in [`docs/decisions.md`](docs/decisions.md) and [`ai/`](ai/README.md).
+5. Follow [`docs/plan.md`](docs/plan.md) for the phase sequence.
 
-## Current status
+## Local development
 
-The architecture is a draft for review. Do not treat the existing exploratory scaffold as the approved product implementation. No feature code should be extended until the user and Codex agree on the architecture and the decisions needed for the first slice.
+Run PostgreSQL and the app with Docker Compose. Exact commands and environment variables will be documented with the setup slice. The application uses synthetic data only. The seed command creates exactly 10,000 employees; the smaller Playwright fixture set is separate.
 
-The intended stack is Java 17, Spring Boot, PostgreSQL, React, and TypeScript. The four modules and exclusions are listed in the requirements document.
+## Tests
 
-## Planned deliverables
+Backend unit tests use JUnit 5 and Mockito. Angular unit tests use the Angular CLI supported runner. Playwright scripts cover `@sanity`, `@functional`, `@data`, and (time permitting) `@e2e`. CI runs tests and saves reports; deploys are handled by Render and Netlify GitHub auto-deploy.
 
-- One-page requirements document
-- Reviewed architecture and design notes
-- Working backend and UI
-- Deterministic seed for 10,000 fictional employees
-- Tests, deployment instructions, and demo video
-- Incremental commits and AI work notes
+## Submission
+
+The submission includes this repository, a public synthetic-data deployment, test/report artifacts, committed design and AI notes, and a demo video. The repository is private; grant reviewer access before sharing its link.

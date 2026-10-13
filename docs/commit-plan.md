@@ -1,24 +1,21 @@
-# Initial documentation and commit plan
+# Incremental Commit Plan
 
-Keep the history small and meaningful. Do not combine the requirements, design agreement, infrastructure, and feature work into one large commit.
+The approved technical and product details live in [`design.md`](design.md). Keep each change small and reviewable. Every feature slice includes its migration, API, UI, unit tests, and matching Playwright tests.
 
-## Documentation-first commits
+## Planned order
 
-1. `docs: define salary management requirements`
-   - Add `requirements.md` with the goal, four modules, exclusions, and acceptance criteria.
-2. `docs: add Codex project rules and decision log`
-   - Add `AGENTS.md`, `docs/decisions.md`, and `ai/README.md`.
-3. `docs: capture architecture draft and open decisions`
-   - Save the no-code plan in `docs/design.md` and keep the component view in `docs/architecture.md`. Mark both as drafts until the user reviews them.
+1. `docs: confirm design decisions` — approved architecture and Codex package rules. Completed before implementation.
+2. `docs: align project notes with approved design` — update older README, architecture navigation, requirements pointer, and decisions log.
+3. `chore: clean scaffold and configure PostgreSQL` — remove H2 configuration, establish Spring/Angular dependencies, Flyway and Compose PostgreSQL, app health.
+4. `feat: deploy first employee directory slice` — minimal working people list, public Render/Netlify integration auto-deploy.
+5. `feat: add employee search and maintenance` — employee/department lookup, create/edit/archive, filters, paging.
+6. `feat: add effective-dated salary history` — salary_versions with generated gross/net and validations.
+7. `feat: seed 10000 deterministic employees` — UUID v5 employee IDs and balanced role groups.
+8. `feat: add pay insights and role outliers` — SQL aggregates and job-title/country/currency IQR groups.
+9. `feat: add stateless Excel import and filtered export` — preview/revalidate/atomic confirm, file export.
+10. `feat: add activity log and read-only activity screen` — audit events for employee/salary/import/export actions.
+11. `test: add Playwright sanity functional and data coverage` — deterministic fixtures, CI test workflow and report upload.
+12. `perf: verify 10000-row queries and indexes` — add only measured indexes and record results.
+13. `docs: add runbook and submission artifacts` — seed/test/deploy instructions, AI notes, performance notes, demo video and final checklist.
 
-Review these documentation changes before application code. The current architecture is a draft and must not be treated as approval. Update the decision log and design docs to reflect the user's feedback.
-
-## Setup commit after architecture approval
-
-4. `chore: add application and database foundation` (only after architecture approval)
-   - Add Java and React project skeletons, Docker Compose with PostgreSQL, Flyway wiring, local configuration examples, and a health check.
-   - Do not include employee or salary features in this commit.
-
-## Feature commits after setup
-
-Follow the reviewed feature order in `docs/architecture.md`: people and departments; salary structure and history; seed data; pay insights; Excel import/export; React screens; performance check; deployment and demo. Give each feature a focused commit with its tests and an `/ai` note. Adjust the order only after recording the reason.
+GitHub Actions runs tests only. Render and Netlify integrations deploy from GitHub directly. No deploy steps belong in CI workflows.

@@ -1,50 +1,26 @@
 # Decision Log
 
-Record confirmed decisions here so important chat context stays with the repository. Do not silently turn a proposal into a requirement. Add the date, decision, reason, and affected docs/commits when a choice is confirmed.
+Record confirmed choices here so the repo preserves decisions made in chat. The current source documents are [`requirements.md`](requirements.md) and [`design.md`](design.md). Update this log when implementation changes an approved choice.
 
-## Confirmed by the user
+## Confirmed decisions
 
-| Date | Decision | Reason or context |
+| Date | Decision | Reason |
 |---|---|---|
-| 2026-10-14 | Assessment is for a Java 17, Spring Boot, PostgreSQL, React, and TypeScript application. | Matches the engineer's existing stack and the assessment. |
-| 2026-10-14 | Primary user is the HR manager maintaining salary data for 10,000 employees across countries. | Replaces spreadsheet-based salary management and answers questions about organizational pay. |
-| 2026-10-14 | Product scope has four modules: people/departments; salary structure; Excel import/export; pay insights. | Explicit product decision from the user. Full details are in `requirements.md`. |
-| 2026-10-14 | Salary structure includes basic pay, allowances, deductions, calculated gross/net, and a simple change history. | User-defined module scope. Calculation rules remain to be agreed. |
-| 2026-10-14 | Insights include average, median, range by country, department, and job title, plus outliers within a role. | User-defined product requirement. Statistical definitions remain to be agreed. |
-| 2026-10-14 | Exclude payroll runs, tax, payslips, approval workflows, and role-based login. | Payroll is a separate product. Keep the focus on understanding how the organization pays people. |
-| 2026-10-14 | Write the requirements document first and make it the first commit. | Required to show product framing before implementation. |
-| 2026-10-14 | Add `AGENTS.md`, request a no-code design plan, and save the agreed architecture in Markdown before implementation. | Do not start coding until the user and Codex agree on the architecture. |
-| 2026-10-14 | Keep decisions and meaningful AI/build work in Markdown files in the repository. | Preserve chat decisions and implementation rationale for review and interview discussion. |
-| 2026-10-14 | Use incremental Git commits, with tests alongside features. | Make the engineering process reviewable and maintain quality. |
-
-## Proposals awaiting agreement
-
-| Proposal | Why it may fit | Decision needed |
-|---|---|---|
-| Use a Spring Boot modular monolith with four feature packages and one PostgreSQL database. | Simple transactions and deployment for a 10,000-person assessment, with visible module boundaries. | Confirm or revise the architecture. |
-| Store salary changes as effective-dated versions with component rows. | Gives a clear history without implementing payroll. | Confirm history behavior and effective-date rules. |
-| Calculate gross as basic plus allowances, and net as gross minus deductions. | A simple starting formula. | Confirm whether deductions are positive inputs and whether net may be negative. |
-| Group all monetary insights by currency and do not convert currencies. | Prevents misleading cross-currency comparisons. | Confirm any reporting currency or conversion requirement. |
-| Define outliers with an agreed statistical method and minimum group size. | Avoids unstable labels for small samples. | Choose IQR, z-score, or another rule and define minimum count. |
-| Preview imports before explicit confirmation. | Lets HR inspect row-level problems before updates. | Decide whether valid rows can be confirmed when other rows are invalid, and whether the batch is atomic. |
-| Use Docker Compose for local development and choose hosting after the app is ready. | Makes setup repeatable without assuming a hosting account. | Choose deployment target and demo access boundary. |
-
-## Open questions to resolve before feature code
-
-1. Which employee fields are required? Is employee number unique and immutable? Should the app store contact details?
-2. Are salaries annual, monthly, hourly, or configurable by pay frequency?
-3. What precision and rounding rule apply to each currency and component?
-4. Do deductions enter as positive amounts to subtract, or signed amounts? Can calculated net be negative?
-5. How should salary history handle backdated changes and overlapping effective dates?
-6. What qualifies as an outlier, and what minimum group size is meaningful?
-7. Should import be all-or-nothing or allow valid rows when some rows fail? What file size and row count should be supported?
-8. What access boundary should the deployed demo use when role-based login is excluded? Use synthetic data only until this is agreed.
-9. Which hosting platform is available, and who provides its credentials?
+| 2026-10-14 | Build for the HR manager maintaining records for 10,000 fictional employees in five countries. | Directly addresses the assessment and avoids use of real salary data. |
+| 2026-10-14 | Stack: Java 17, Spring Boot, Spring Data JPA, Flyway, PostgreSQL; standalone Angular, Angular Material, strict TypeScript; Playwright; Docker Compose. | User selected the stack; modern Angular is intended. |
+| 2026-10-14 | Deploy API/PostgreSQL on Render and Angular static app on Netlify. Use provider GitHub auto-deploy; CI runs tests only. | Reduce deployment wiring and do not deploy from GitHub Actions. |
+| 2026-10-14 | Scope is people/departments, salary/history, Excel import/export, pay insights, and read-only activity. Exclude payroll runs, tax, payslips, approvals, and role-based login. | Keep the assessment focused on salary management and pay questions. |
+| 2026-10-14 | Employee fields include unique employee number, name, case-insensitive unique work email, hire date, country, department, and job title. Archive is soft delete. | Preserve employee identity and salary/audit history. |
+| 2026-10-14 | Salary changes are append-only effective-dated snapshots. Inputs are nonnegative basic, allowances, and deductions; gross is basic + allowances; net is gross - deductions; use two decimals and reject negative net. New effective dates follow the latest. | Clear history and exact calculations without modeling payroll. |
+| 2026-10-14 | PostgreSQL stores generated `gross` and `net` columns on `salary_versions`; insights/tests read these values. | Keep derived values consistent in storage. PostgreSQL net expression uses base columns because generated expressions cannot depend on another generated column. |
+| 2026-10-14 | Currency is local to each of US/USD, India/INR, UK/GBP, Germany/EUR, Canada/CAD; never mix currencies. New salary versions follow the employee country currency. | Avoid misleading cross-currency comparisons. |
+| 2026-10-14 | Outliers use IQR grouped only by job title + country + currency, minimum five salaries per group. | One consistent definition in all views. |
+| 2026-10-14 | Seed exactly 10,000 fictional employees, distributed as 200 employees in each of 50 job-title/country/currency groups. Employee IDs use deterministic UUID v5 derived from employee number. | Every outlier group can be evaluated and repeated seed runs are stable. |
+| 2026-10-14 | Excel import is stateless, create-only, revalidated at confirmation, and atomic. No import batch/row tables. | Avoid temporary batch persistence and partial imports. |
+| 2026-10-14 | Add an activity log for employee, salary, import, and export actions. Activity screen is read-only. Without login use configured `assessment-hr-manager` actor, labeled unverified. | Record actions while preserving the no-login scope. |
+| 2026-10-14 | Use one Spring Boot app with layer-based packages and the approved Angular `core/shared/features` layout. Components do not call `HttpClient`; shared components have stable test IDs. | Reuse shared code and keep screens maintainable. |
+| 2026-10-14 | Implement small vertical slices; commit each with its unit and matching Playwright tests. After each phase report done/tests/next in three lines. | Keep progress reviewable and tests close to behavior. |
 
 ## Implementation record
 
-For each accepted feature, link the requirement, implementation commit, tests run, and any change to this log. Keep AI notes in `/ai`, using the template in `ai/README.md`.
-
-## Workspace status note
-
-An exploratory Angular/H2 scaffold was started before the user confirmed the Java/PostgreSQL/React stack and four-module scope. It has not been reviewed, tested, or approved. Do not extend or commit it. After architecture agreement, decide whether to replace or remove that scaffold as part of the setup commit. The requirements, architecture draft, and this log are the source of truth in the meantime.
+For each feature commit, add a row or note with its tests and any trade-off. Record prompts, AI errors, and corrections in `/ai`. Never record credentials or real employee data.
