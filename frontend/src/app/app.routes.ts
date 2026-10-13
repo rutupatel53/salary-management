@@ -1,9 +1,8 @@
 import { Routes } from '@angular/router';
-import { EmployeesComponent } from './features/employees/employees.component';
-import { EmployeeDetailComponent } from './features/employees/employee-detail.component';
 export const appRoutes: Routes = [
  { path: '', pathMatch: 'full', redirectTo: 'employees' },
- { path: 'employees', component: EmployeesComponent },
- { path: 'employees/:id', component: EmployeeDetailComponent },
+ { path: 'employees', loadComponent: () => import('./features/employees/employees.component').then(m => m.EmployeesComponent) },
+ { path: 'employees/:id', loadComponent: () => import('./features/employees/employee-detail.component').then(m => m.EmployeeDetailComponent) },
+ { path: 'insights', loadComponent: () => import('./features/insights/insights.component').then(m => m.InsightsComponent) },
  { path: '**', redirectTo: 'employees' }
 ];
