@@ -1,0 +1,10 @@
+**/node_modules/
+**/dist/
+**/target/
+data/
+*.mv.db
+*.trace.db
+.angular/
+.env
+.env.*
+!.env.example
