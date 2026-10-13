@@ -169,7 +169,7 @@ All endpoints are under `/api`. Paginated endpoints cap `size` at 100 and return
 | `POST /imports/preview` | Validate uploaded workbook and return row-level preview/errors | Multipart `.xlsx`; file/row limits; no writes; reject malformed headers, invalid dates/amounts, duplicate IDs/emails, and unsupported country/currency. |
 | `POST /imports/confirm` | Re-upload, revalidate, and atomically create all rows | No batch ID or stored preview. Any invalid row means zero writes. Recheck DB uniqueness inside the transaction. |
 | `GET /employees/export` | Stream current filtered view as `.xlsx` | Apply same active filters as list; include currency; formula-safe text; record successful export activity. |
-| `GET /activity` | Read-only newest-first activity feed | Filter/paginate by employee/action; no create/update/delete route. |
+| `GET /activity` | Read-only newest-first activity feed | Bounded server-side pagination and optional action filter; no create/update/delete route. |
 
 ### Import contract
 
