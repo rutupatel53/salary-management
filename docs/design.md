@@ -136,9 +136,9 @@ erDiagram
 | `activity_log` | PK; required actor/action/time; optional employee FK using `ON DELETE SET NULL`; action `CHECK`; no update/delete API | Preserve history if a target is unavailable; keep the activity view read-only. |
 | `activity_log` | Index `(occurred_at DESC, activity_id DESC)` and `(employee_id, occurred_at DESC)` | Support the newest-first activity screen and employee-specific history. |
 
-The work email uniqueness rule is case-insensitive. Normalize whitespace and case in the service and keep a unique expression index as the final guard. Use stable ordering with an ID tie-breaker for pagination. Do not add `pg_trgm` or other extensions until 10,000-row measurements show a need.
+The work email uniqueness rule is case-insensitive. Normalize whitespace and case in the service and keep a unique expression index as the final guard. Use stable ordering with an ID tie-breaker for pagination. Do not add `pg_trgm` or other extensions until 10,000-row measurements show a need. Local, CI, and Render databases use PostgreSQL 16.
 
-PostgreSQL generated expressions cannot reference another generated column. Therefore `net` uses the algebraically equivalent base-column expression `basic_amount + allowances_amount - deductions_amount`; it equals `gross - deductions_amount`. Insights and tests read the stored `gross` and `net` columns. See [PostgreSQL generated-column restrictions](https://www.postgresql.org/docs/17/ddl-generated-columns.html).
+PostgreSQL generated expressions cannot reference another generated column. Therefore `net` uses the algebraically equivalent base-column expression `basic_amount + allowances_amount - deductions_amount`; it equals `gross - deductions_amount`. Insights and tests read the stored `gross` and `net` columns. The supported engine is PostgreSQL 16. See [PostgreSQL 16 generated-column restrictions](https://www.postgresql.org/docs/16/ddl-generated-columns.html).
 
 ### Tables deliberately omitted
 
@@ -150,7 +150,7 @@ PostgreSQL generated expressions cannot reference another generated column. Ther
 
 ## REST API
 
-All endpoints are under `/api`. Paginated endpoints cap `size` at 100 and return DTOs. Errors use a stable shape with a message and field errors. The API has no role-based login; only synthetic data may be exposed publicly.
+All endpoints are under `/api`. Paginated endpoints cap `size` at 100 and return DTOs. Every JSON feature response uses `{ "status": 200, "success": true, "message": "...", "data": ..., "errors": {} }`; errors use the same envelope with the matching HTTP status, `success: false`, and field-level errors where available. Create operations and successful import confirmation return HTTP 201. Template/export downloads remain binary responses, and `/health` keeps its probe response. The API has no role-based login; only synthetic data may be exposed publicly.
 
 | Method and path | Purpose | Key validation and behavior |
 |---|---|---|

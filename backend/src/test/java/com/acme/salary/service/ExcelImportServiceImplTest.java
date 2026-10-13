@@ -20,7 +20,9 @@ import org.springframework.mock.web.MockMultipartFile;
 
 import java.io.ByteArrayOutputStream;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -43,11 +45,13 @@ class ExcelImportServiceImplTest {
         validatorFactory = Validation.buildDefaultValidatorFactory(); validator = validatorFactory.getValidator();
         service = new ExcelImportServiceImpl(employees, countries, departments, validator, jdbc, audit);
         Department department = mock(Department.class); when(department.getId()).thenReturn(UUID.fromString("00000000-0000-5000-8000-000000000001"));
-        when(departments.findByNameIgnoreCaseAndActiveTrue("Engineering")).thenReturn(Optional.of(department));
+        when(department.getName()).thenReturn("Engineering");
+        when(departments.findByActiveTrueOrderByName()).thenReturn(List.of(department));
         Country country = mock(Country.class); when(country.getCurrencyCode()).thenReturn("INR");
-        when(countries.findById("IN")).thenReturn(Optional.of(country));
-        when(employees.existsByEmployeeNumberIgnoreCase(anyString())).thenReturn(false);
-        when(employees.existsByWorkEmailIgnoreCase(anyString())).thenReturn(false);
+        when(country.getCode()).thenReturn("IN");
+        when(countries.findAll()).thenReturn(List.of(country));
+        when(employees.findExistingEmployeeNumbers(anyCollection())).thenReturn(Set.of());
+        when(employees.findExistingWorkEmails(anyCollection())).thenReturn(Set.of());
     }
 
     @AfterEach void closeValidator() { validatorFactory.close(); }
@@ -62,6 +66,15 @@ class ExcelImportServiceImplTest {
         var response = service.preview(workbook("IMP-102", "negative@example.test", "10000", "0", "10001"));
         assertEquals(1, response.invalidRows());
         assertTrue(response.rows().get(0).errors().stream().anyMatch(message -> message.contains("Deductions cannot exceed gross")));
+        verifyNoInteractions(jdbc, audit);
+    }
+
+    @Test void previewRejectsMoneyWithMoreThanTwoDecimalPlaces() throws Exception {
+        var response = service.preview(workbook("IMP-106", "scale@example.test", "85000.001", "5000", "10000"));
+
+        assertEquals(1, response.invalidRows());
+        assertTrue(response.rows().get(0).errors().stream()
+                .anyMatch(message -> message.contains("Basic must be non-negative with at most two decimal places.")));
         verifyNoInteractions(jdbc, audit);
     }
 

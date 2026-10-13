@@ -4,6 +4,7 @@ import com.acme.salary.dto.ApiResponse;
 import com.acme.salary.dto.ImportConfirmResponse;
 import com.acme.salary.dto.ImportPreviewResponse;
 import com.acme.salary.service.ExcelImportService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,11 +28,14 @@ public class ImportController {
 
     @PostMapping(value = "/preview", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<ImportPreviewResponse> preview(@RequestPart("file") MultipartFile file) {
-        return new ApiResponse<>(service.preview(file), "Review row errors before confirming the import.");
+        return ApiResponse.success(HttpStatus.OK.value(), service.preview(file),
+                "Review row errors before confirming the import.");
     }
 
     @PostMapping(value = "/confirm", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ApiResponse<ImportConfirmResponse> confirm(@RequestPart("file") MultipartFile file) {
-        return new ApiResponse<>(service.confirm(file), "Import completed.");
+    public ResponseEntity<ApiResponse<ImportConfirmResponse>> confirm(@RequestPart("file") MultipartFile file) {
+        ImportConfirmResponse result = service.confirm(file);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(
+                HttpStatus.CREATED.value(), result, "Import completed."));
     }
 }

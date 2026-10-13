@@ -23,7 +23,7 @@ class SalaryServiceImplTest{
  private EmployeeRepository employees;private SalaryVersionRepository salaries;private SalaryVersionMapper mapper;private AuditService audit;private EntityManager entityManager;private SalaryServiceImpl service;private UUID employeeId;
  @BeforeEach void setup(){
   employees=mock(EmployeeRepository.class);salaries=mock(SalaryVersionRepository.class);mapper=mock(SalaryVersionMapper.class);audit=mock(AuditService.class);entityManager=mock(EntityManager.class);service=new SalaryServiceImpl(employees,salaries,mapper,audit,entityManager);employeeId=UUID.randomUUID();
-  Employee employee=mock(Employee.class);Country country=mock(Country.class);when(employee.getCountry()).thenReturn(country);when(country.getCurrencyCode()).thenReturn("INR");when(employees.findById(employeeId)).thenReturn(Optional.of(employee));when(salaries.findTopByEmployeeIdOrderByEffectiveDateDesc(employeeId)).thenReturn(Optional.empty());
+  Employee employee=mock(Employee.class);Country country=mock(Country.class);when(employee.getCountry()).thenReturn(country);when(country.getCurrencyCode()).thenReturn("INR");when(employees.findByIdAndArchivedAtIsNull(employeeId)).thenReturn(Optional.of(employee));when(salaries.findTopByEmployeeIdOrderByEffectiveDateDesc(employeeId)).thenReturn(Optional.empty());
  }
  private SalaryChangeRequest request(String basic,String allowances,String deductions,String effective){return new SalaryChangeRequest(new BigDecimal(basic),new BigDecimal(allowances),new BigDecimal(deductions),"INR",LocalDate.parse(effective));}
  @Test void appendsRoundedSnapshotAndAuditsChange(){

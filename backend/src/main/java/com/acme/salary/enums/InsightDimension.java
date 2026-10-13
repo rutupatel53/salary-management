@@ -1,6 +1,6 @@
 package com.acme.salary.enums;
 public enum InsightDimension{
- COUNTRY("c.name"),DEPARTMENT("d.name"),JOB_TITLE("e.job_title");
+ COUNTRY("country_ref.name"),DEPARTMENT("department_ref.name"),JOB_TITLE("employee.job_title");
  private final String expression;
  InsightDimension(String expression){this.expression=expression;}
  public String expression(){return expression;}

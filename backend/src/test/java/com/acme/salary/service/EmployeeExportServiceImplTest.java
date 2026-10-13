@@ -41,7 +41,7 @@ class EmployeeExportServiceImplTest {
                 .thenReturn(new PageImpl<>(List.of(employee), PageRequest.of(0, 500), 1));
         doAnswer(invocation -> {
             ResultSet rs = mock(ResultSet.class);
-            when(rs.next()).thenReturn(true, false); when(rs.getObject("employee_id")).thenReturn(id);
+            when(rs.next()).thenReturn(true, false); when(rs.getObject("employee_id", UUID.class)).thenReturn(id);
             when(rs.getString("currency_code")).thenReturn("USD");
             when(rs.getBigDecimal("basic_amount")).thenReturn(new BigDecimal("100000000.01"));
             when(rs.getBigDecimal("allowances_amount")).thenReturn(new BigDecimal("0.02"));

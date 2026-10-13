@@ -1,11 +1,12 @@
 import { test, expect } from '@playwright/test';
-import { database } from '../support/database';
+import { createDatabase } from '../support/database';
 
 const apiURL=process.env.API_URL??'http://127.0.0.1:8080/api';
+const database=createDatabase();
 test.afterAll(async()=>{await database.end();});
 
 test('@data seed contains exactly 10000 unique fictional employees',async({request})=>{
- const api=await request.get(`${apiURL}/employees`,{params:{page:0,size:1,q:'ACME-'}});expect(api.ok()).toBeTruthy();expect((await api.json()).totalItems).toBe(10000);
+ const api=await request.get(`${apiURL}/employees`,{params:{page:0,size:1,q:'ACME-'}});expect(api.ok()).toBeTruthy();expect((await api.json()).data.totalItems).toBe(10000);
  const count=await database.query("SELECT count(*)::int AS count FROM employees WHERE employee_number LIKE 'ACME-%'");expect(count.rows[0].count).toBe(10000);
  const duplicates=await database.query("SELECT count(*)::int AS count FROM (SELECT lower(work_email) FROM employees WHERE employee_number LIKE 'ACME-%' GROUP BY lower(work_email) HAVING count(*)>1) x");expect(duplicates.rows[0].count).toBe(0);
 });

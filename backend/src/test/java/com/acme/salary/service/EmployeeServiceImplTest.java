@@ -28,7 +28,7 @@ class EmployeeServiceImplTest {
   employees=mock(EmployeeRepository.class);countries=mock(CountryRepository.class);departments=mock(DepartmentRepository.class);mapper=mock(EmployeeMapper.class);audit=mock(AuditService.class);
   service=new EmployeeServiceImpl(employees,countries,departments,mapper,audit);
   when(countries.findById("IN")).thenReturn(Optional.of(mock(Country.class)));
-  Department department=mock(Department.class);when(department.isActive()).thenReturn(true);when(departments.findById(departmentId)).thenReturn(Optional.of(department));
+  Department department=mock(Department.class);when(department.isActive()).thenReturn(true);when(departments.findByIdAndActiveTrue(departmentId)).thenReturn(Optional.of(department));
  }
  @Test void createNormalizesIdentityAndRecordsAudit(){
   var request=new EmployeeRequest("EMP-1"," Riya "," Shah "," RIYA@EXAMPLE.COM ",LocalDate.of(2020,1,2),"IN",departmentId," Engineer ");

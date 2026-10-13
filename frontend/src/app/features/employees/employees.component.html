@@ -1,14 +1,13 @@
 <section class="page-heading"><div><span class="eyebrow">PEOPLE OPERATIONS</span><h1>Employee directory</h1><p>Find and maintain employee information.</p></div><button mat-flat-button color="primary" data-testid="add-employee" (click)="openCreate()">Add employee</button></section>
 <div class="notice" role="status" *ngIf="notice.message()">{{notice.message()}}</div>
-<section class="filters" aria-label="Employee filters">
+<app-filter-bar (clear)="clearFilters()">
  <mat-form-field appearance="outline"><mat-label>Search</mat-label><input matInput data-testid="employee-search" [(ngModel)]="filters.q" (keyup.enter)="applyFilters()" placeholder="Name, email, number or title"></mat-form-field>
  <mat-form-field appearance="outline"><mat-label>Country</mat-label><mat-select [(ngModel)]="filters.country" (selectionChange)="applyFilters()"><mat-option value="">All countries</mat-option><mat-option *ngFor="let c of countries" [value]="c.countryCode">{{c.name}}</mat-option></mat-select></mat-form-field>
  <mat-form-field appearance="outline"><mat-label>Department</mat-label><mat-select [(ngModel)]="filters.department" (selectionChange)="applyFilters()"><mat-option value="">All departments</mat-option><mat-option *ngFor="let d of departments" [value]="d.id">{{d.name}}</mat-option></mat-select></mat-form-field>
- <button mat-button type="button" (click)="filters={q:'',country:'',department:'',jobTitle:''};applyFilters()">Clear</button>
-</section>
-<p class="error" role="alert" *ngIf="error">{{error}}</p><p *ngIf="loading" data-testid="loading">Loading employees…</p>
+ </app-filter-bar>
+<app-error-state *ngIf="error" [message]="error"></app-error-state><app-loading-state *ngIf="loading" message="Loading employees…" data-testid="loading"></app-loading-state>
 <app-empty-state *ngIf="!loading&&!error&&rows.length===0" title="No employees found" message="Try different filters or add an employee."></app-empty-state>
-<div class="table-wrap" *ngIf="rows.length"><table mat-table [dataSource]="rows" data-testid="employee-table">
+<app-server-paged-table *ngIf="rows.length" [length]="total" [pageIndex]="page" [pageSize]="size" [pageSizeOptions]="[10,25,50,100]" (pageChange)="pageChange($event)"><table mat-table [dataSource]="rows" data-testid="employee-table">
  <ng-container matColumnDef="employeeNumber"><th mat-header-cell *matHeaderCellDef>Employee no.</th><td mat-cell *matCellDef="let e">{{e.employeeNumber}}</td></ng-container>
  <ng-container matColumnDef="name"><th mat-header-cell *matHeaderCellDef>Name</th><td mat-cell *matCellDef="let e"><a [routerLink]="['/employees',e.id]">{{e.firstName}} {{e.lastName}}</a></td></ng-container>
  <ng-container matColumnDef="workEmail"><th mat-header-cell *matHeaderCellDef>Work email</th><td mat-cell *matCellDef="let e">{{e.workEmail}}</td></ng-container>
@@ -16,14 +15,14 @@
  <ng-container matColumnDef="country"><th mat-header-cell *matHeaderCellDef>Country</th><td mat-cell *matCellDef="let e">{{e.countryName}}</td></ng-container>
  <ng-container matColumnDef="department"><th mat-header-cell *matHeaderCellDef>Department</th><td mat-cell *matCellDef="let e">{{e.departmentName}}</td></ng-container>
  <ng-container matColumnDef="jobTitle"><th mat-header-cell *matHeaderCellDef>Job title</th><td mat-cell *matCellDef="let e">{{e.jobTitle}}</td></ng-container>
- <ng-container matColumnDef="actions"><th mat-header-cell *matHeaderCellDef>Actions</th><td mat-cell *matCellDef="let e"><button mat-button (click)="openEdit(e)" [attr.data-testid]="'edit-'+e.employeeNumber">Edit</button><button mat-button color="warn" (click)="archive(e)">Archive</button></td></ng-container>
+ <ng-container matColumnDef="actions"><th mat-header-cell *matHeaderCellDef>Actions</th><td mat-cell *matCellDef="let e"><button mat-button (click)="openEdit(e)" [attr.data-testid]="'edit-'+e.employeeNumber">Edit</button><button mat-button color="warn" (click)="archive(e)" [attr.data-testid]="'archive-'+e.employeeNumber">Archive</button></td></ng-container>
  <tr mat-header-row *matHeaderRowDef="columns"></tr><tr mat-row *matRowDef="let row;columns:columns" [attr.data-testid]="'employee-row-'+row.employeeNumber"></tr>
- </table><mat-paginator [length]="total" [pageIndex]="page" [pageSize]="size" [pageSizeOptions]="[10,25,50,100]" (page)="pageChange($event)" data-testid="employee-pagination"></mat-paginator></div>
+ </table></app-server-paged-table>
 <section class="editor" *ngIf="formOpen" aria-label="Employee form" data-testid="employee-form"><h2>{{editing?'Edit employee':'Add employee'}}</h2><form [formGroup]="form" (ngSubmit)="save()">
- <mat-form-field appearance="outline"><mat-label>Employee number</mat-label><input matInput formControlName="employeeNumber"></mat-form-field>
- <mat-form-field appearance="outline"><mat-label>First name</mat-label><input matInput formControlName="firstName"></mat-form-field><mat-form-field appearance="outline"><mat-label>Last name</mat-label><input matInput formControlName="lastName"></mat-form-field>
- <mat-form-field appearance="outline"><mat-label>Work email</mat-label><input matInput type="email" formControlName="workEmail"></mat-form-field><mat-form-field appearance="outline"><mat-label>Hire date</mat-label><input matInput type="date" formControlName="hireDate"></mat-form-field>
- <mat-form-field appearance="outline"><mat-label>Country</mat-label><mat-select formControlName="countryCode"><mat-option *ngFor="let c of countries" [value]="c.countryCode">{{c.name}} ({{c.currencyCode}})</mat-option></mat-select></mat-form-field>
- <mat-form-field appearance="outline"><mat-label>Department</mat-label><mat-select formControlName="departmentId"><mat-option *ngFor="let d of departments" [value]="d.id">{{d.name}}</mat-option></mat-select></mat-form-field><mat-form-field appearance="outline"><mat-label>Job title</mat-label><input matInput formControlName="jobTitle"></mat-form-field>
+ <mat-form-field appearance="outline"><mat-label>Employee number</mat-label><input matInput formControlName="employeeNumber" data-testid="employee-form-number"></mat-form-field>
+ <mat-form-field appearance="outline"><mat-label>First name</mat-label><input matInput formControlName="firstName" data-testid="employee-form-first-name"></mat-form-field><mat-form-field appearance="outline"><mat-label>Last name</mat-label><input matInput formControlName="lastName" data-testid="employee-form-last-name"></mat-form-field>
+ <mat-form-field appearance="outline"><mat-label>Work email</mat-label><input matInput type="email" formControlName="workEmail" data-testid="employee-form-email"></mat-form-field><mat-form-field appearance="outline"><mat-label>Hire date</mat-label><input matInput type="date" formControlName="hireDate" data-testid="employee-form-hire-date"></mat-form-field>
+ <mat-form-field appearance="outline"><mat-label>Country</mat-label><mat-select formControlName="countryCode" data-testid="employee-form-country"><mat-option *ngFor="let c of countries" [value]="c.countryCode">{{c.name}} ({{c.currencyCode}})</mat-option></mat-select></mat-form-field>
+ <mat-form-field appearance="outline"><mat-label>Department</mat-label><mat-select formControlName="departmentId" data-testid="employee-form-department"><mat-option *ngFor="let d of departments" [value]="d.id">{{d.name}}</mat-option></mat-select></mat-form-field><mat-form-field appearance="outline"><mat-label>Job title</mat-label><input matInput formControlName="jobTitle" data-testid="employee-form-title"></mat-form-field>
  <div class="form-actions"><button mat-flat-button color="primary" type="submit" data-testid="save-employee">Save</button><button mat-button type="button" (click)="closeForm()">Cancel</button></div>
  </form></section>
