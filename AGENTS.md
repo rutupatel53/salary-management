@@ -1,26 +1,87 @@
 # Project rules for Codex
 
-## Confirm the plan before coding
+## Source of truth and working order
 
-- Treat `requirements.md`, `docs/architecture.md`, and `docs/decisions.md` as the current project context.
-- The architecture is not approved yet. Do not write or extend application code until the user confirms the architecture and the open decisions needed for the next feature.
-- If a new request changes scope or a design choice, record it in `docs/decisions.md` and update the related requirements or design note before implementation.
-- Keep implementation and AI notes in Markdown so the work remains understandable outside the chat.
+- Treat `docs/assessment-brief.md` as the verbatim source brief, `docs/requirements.md` as the product requirements, and `docs/design.md` as the approved architecture and decisions.
+- The architecture is approved. Continue in MUST-first order from `docs/plan.md`. Do not wait between phases unless a step needs an account, permission, credential, or other action only the user can provide.
+- Implement one vertical slice per commit. A slice includes its database change, API, screen, unit tests, and matching Playwright tests. Keep commits small and use the planned commit message where it still fits.
+- After each phase, send a three-line status: `Done: ...`, `Tests passing: ...`, `Next: ...`.
+- Update design/decision notes when an approved decision changes. Keep AI prompts, mistakes found, and corrections in `/ai`.
+- Never put secrets or real employee/pay data in Git, test fixtures, logs, reports, or the public demo.
 
-## Agreed stack
+## Final stack
 
-- Backend: Java 17 and Spring Boot.
-- Database: PostgreSQL with Flyway migrations.
-- Frontend: React and TypeScript.
+- Backend: Java 17, Spring Boot, Spring Data JPA, Flyway, PostgreSQL.
+- Frontend: current stable Angular, standalone components, Angular Material, strict TypeScript.
+- Tests: JUnit 5/Mockito and Angular's supported unit test runner; Playwright with TypeScript for end-to-end tests.
+- Local environment: Docker Compose with PostgreSQL.
+- Deployment: Render for API/PostgreSQL, Netlify for static Angular UI. Render and Netlify GitHub integrations auto-deploy; GitHub Actions runs tests only and must not deploy.
+- Do not use React, Next.js, SQLite, or AngularJS 1.x.
 
-## Engineering rules after approval
+## Backend package structure
 
-- Use `BigDecimal` for money in Java and `NUMERIC`/`DECIMAL` in PostgreSQL. Never use `float` or `double` for salary values or calculations.
-- Use request and response DTOs at API boundaries. Do not expose JPA entities directly.
-- Keep search, sorting, and pagination server-side. Bound page sizes and avoid loading all employees into memory for list or export requests.
-- Validate inputs on the server. Return clear, stable error responses.
-- Add deterministic tests with every feature. Avoid random test data and test the edge cases for the behavior being changed.
-- Work in small vertical slices. Explain the change, run relevant checks, inspect the diff, and make one focused commit per completed slice.
-- Do not add excluded features: payroll runs, tax, payslips, approval workflows, or role-based login, unless the user changes scope.
-- Never place real personal or salary data, credentials, or secrets in the repository or demo seed.
-- Do not silently change agreed architecture or requirements. Propose a decision and record it first.
+Use a single Spring Boot application with layer-based packages under `...salary`:
+
+```text
+config/
+constants/
+controller/
+dto/          common response envelope, request/response DTOs,
+              shared filter and pagination DTOs
+enums/
+exception/    global exception handler and stable error response
+mapper/       MapStruct mappers
+model/        JPA entities
+repository/   Spring Data repositories
+service/      service interfaces and implementations
+specification/shared database predicates for list and Excel export
+validator/
+util/
+audit/
+seed/
+shared/       helpers reused across packages
+```
+
+Mirror production package paths in `backend/src/test/java`. Put reusable code in shared packages; never duplicate helpers inside services. Controllers only handle HTTP/DTO concerns. Services own business rules and transactions. Repositories perform database work. Do not expose JPA entities from APIs.
+
+## Frontend structure
+
+Under `frontend/src/app`:
+
+```text
+core/       app shell, API base service, HTTP interceptors, notification service
+shared/     server-paged data table, filter bar, confirm dialog,
+            empty/loading/error states, currency display, file upload box,
+            pipes, validators
+features/   employees, salary, insights, import-export, activity
+```
+
+Components never call `HttpClient` directly. Feature API services use the core API base service. Shared components expose stable `data-testid` attributes. Use standalone components and strict template/type checks.
+
+## Data and product rules
+
+- Money is `BigDecimal` in Java and `NUMERIC(14,2)` in PostgreSQL. Never use binary floating point.
+- `salary_versions.gross` and `.net` are PostgreSQL stored generated columns. `gross = basic_amount + allowances_amount`; `net = basic_amount + allowances_amount - deductions_amount` (equivalent to gross minus deductions). PostgreSQL generated expressions cannot reference another generated column, so net must use the base columns. Include a `CHECK (net >= 0)` constraint.
+- Salary versions are append-only and effective-dated. New effective dates must follow the latest version. Currency is the employee country's configured currency and is stored on each version.
+- All queries, exports, and insights use the stored generated gross/net values. Filter, sort, paginate, and aggregate in PostgreSQL. Bound page sizes; never load the complete employee list for UI or export.
+- Outliers always group by job title + country + currency, use IQR, and require at least five salaries per group. The deterministic seed has 200 employees per each of the 50 such groups.
+- Seed exactly 10,000 fictional employees using deterministic UUID v5 identifiers derived from employee numbers. The seed command is repeatable/idempotent. Keep it separate from the small fixed Playwright dataset.
+- Excel import is stateless: preview writes nothing; confirm re-uploads and revalidates the file, then atomically creates all valid rows or none. Do not add import batch/row persistence tables.
+- Archive employees; do not delete salary history or audit records. Activity log records employee/salary/import/export actions and has a read-only screen. Without login, use the configured `assessment-hr-manager` demo actor and label it unverified.
+- Do not add payroll runs, tax, payslips, approval workflows, or role-based login.
+
+## Playwright and CI
+
+- Keep reusable Playwright setup in `/e2e`; use TypeScript, page objects for employee list/detail, insights, and import/export, `BASE_URL`/`API_URL` environment variables, and local Docker Compose defaults.
+- Use independent deterministic tests, fixed fixtures, reset before each test, Playwright auto-waiting and web-first assertions. Never use random test data or fixed sleeps.
+- Add stable test IDs with the screens and shared components. Include each feature's Playwright test in the same commit as the feature.
+- MUST suites: `@sanity`, selected `@functional`, and essential `@data`. `@e2e` journeys and Allure dashboard are SHOULD, after MUST work is complete.
+- GitHub Actions runs tests only: Java and Angular unit tests, Playwright suites, and report artifact upload. Render/Netlify deploy from their GitHub integrations, not CI.
+
+## Engineering quality
+
+- Validate inputs server-side and return a stable error envelope with field errors.
+- Use fixed, meaningful test data. Cover core salary calculations, constraints, history, filters, import behavior, currency grouping, and edge cases.
+- Preserve database relationships and audit history. Build the smallest schema that meets requirements: no arbitrary salary-component table for the fixed three amounts; no import batch tables for stateless import.
+- Measure queries with the 10,000-row seed before adding indexes. Record index and performance decisions in Markdown.
+- Do not silently change requirements, formulas, schema, or API contracts. Update the design/decision record before implementing a material change.

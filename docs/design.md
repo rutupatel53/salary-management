@@ -18,7 +18,8 @@ flowchart LR
     DB[(Render PostgreSQL)]
     MIG[Flyway migrations]
     AUD[Activity log writes]
-    CI[GitHub Actions<br/>build and test on push]
+    GH[GitHub repository]
+    CI[GitHub Actions<br/>tests only]
     COMPOSE[Docker Compose<br/>local PostgreSQL]
     PW[Playwright TypeScript<br/>sanity, functional, data, e2e]
     REPORT[HTML, JUnit XML<br/>optional Allure history]
@@ -30,21 +31,44 @@ flowchart LR
     RENDER --> API --> APP --> REPO --> DB
     APP --> AUD --> DB
     MIG --> DB
+    GH -->|push starts tests| CI
     CI -->|Maven and Angular checks| COMPOSE
     CI --> PW -->|HTTP and browser| UI
     PW -->|API client and test-only DB checks| DB
     PW --> REPORT
-    CI -->|deploy after checks| RENDER
-    CI -->|deploy static build| NET
+    GH -->|GitHub auto-deploy| RENDER
+    GH -->|GitHub auto-deploy| NET
 ```
 
 **Request path:** Angular components call typed API services. Controllers accept request DTOs and validate input. Application services enforce employee and salary rules and write audit events in the same transaction as successful mutations. Repositories use bounded pages or database aggregates. A shared exception handler returns stable field-level validation errors. Flyway is the only schema-change mechanism.
 
-**Local and CI flow:** Docker Compose starts PostgreSQL for local development. GitHub Actions runs Java/Angular unit tests, then tagged Playwright tests against a test database. Test reset support is restricted to test/local profiles. CI retains HTML and JUnit reports. A successful main-branch push can deploy the API to Render and UI to Netlify. Do not put production secrets in Git or CI artifacts.
+**Local and CI flow:** Docker Compose starts PostgreSQL for local development. GitHub Actions runs Java/Angular unit tests, then tagged Playwright tests against a test database. Test reset support is restricted to test/local profiles. CI retains HTML and JUnit reports and runs tests only. GitHub repository integrations auto-deploy the API to Render and UI to Netlify after pushes; CI contains no deploy jobs. Do not put production secrets in Git or CI artifacts.
+
+## Code structure
+
+Keep one Spring Boot deployable, organized by the approved layer-based packages. Shared helpers live in `shared` packages and are reused; do not copy helpers into services. Backend unit tests mirror the production package paths under `src/test/java`.
+
+```text
+backend/src/main/java/.../salary/
+  config/ constants/ controller/ dto/ enums/ exception/ mapper/
+  model/ repository/ service/ specification/ validator/ util/
+  audit/ seed/ shared/
+backend/src/test/java/.../salary/
+  (same package layout, with focused unit tests)
+frontend/src/app/
+  core/       app shell, API base service, HTTP interceptors, notifications
+  shared/     server-paged table, filter bar, confirm dialog, empty/loading/error states,
+              currency display, file upload box, pipes, validators
+  features/   employees, salary, insights, import-export, activity
+e2e/
+  tests/ pages/ fixtures/ support/ playwright.config.ts
+```
+
+`dto` contains the common response envelope, request/response DTOs, and shared filter/pagination DTOs. `service` has interfaces and implementations; business rules and transactions live here. `mapper` uses MapStruct. `specification` owns employee list predicates and is reused by filtered Excel export. `exception` provides the global error handler. `audit` writes activity events; `seed` owns deterministic synthetic data. Angular components never call `HttpClient` directly: feature API services use the shared core API base service. Shared Angular components expose stable `data-testid` attributes.
 
 ## Database schema
 
-Use five tables. Country and department rows are reference data. Salary versions store the three fixed amounts directly, so a component table is not needed. Imports have no stored batch or row tables: preview and confirm are stateless requests. The activity log is required by scope.
+Use five tables. Country and department rows are reference data. Salary versions store the three fixed amounts directly, plus PostgreSQL stored generated columns for gross and net, so a component table is not needed. Imports have no stored batch or row tables: preview and confirm are stateless requests. The activity log is required by scope.
 
 ```mermaid
 erDiagram
@@ -85,6 +109,8 @@ erDiagram
         numeric basic_amount
         numeric allowances_amount
         numeric deductions_amount
+        numeric gross GENERATED_STORED
+        numeric net GENERATED_STORED
         timestamptz created_at
     }
     ACTIVITY_LOG {
@@ -105,12 +131,14 @@ erDiagram
 | `departments` | Primary key; unique normalized department name; `active` not null | Prevent duplicate reference values and let forms exclude inactive choices. |
 | `employees` | Primary key; unique `employee_number`; unique index on `lower(work_email)`; required hire date/country/department/job title; foreign keys; nonblank name/email checks | Enforce identity and required-field rules in the database as well as the API. |
 | `employees` | Index `(archived_at, employee_number)`; indexes on `country_code`, `department_id`; add job-title/search indexes only after the seeded query check | Support default active listing, filters, and stable paging without speculative index sprawl. |
-| `salary_versions` | Unique `(employee_id, effective_date)`; FK to employee; nonnegative `NUMERIC(14,2)` amounts; `deductions_amount <= basic_amount + allowances_amount` | Preserve one salary snapshot per effective date and enforce no negative net at storage level. |
+| `salary_versions` | Unique `(employee_id, effective_date)`; FK to employee; nonnegative `NUMERIC(14,2)` inputs; stored generated `gross = basic_amount + allowances_amount`; stored generated `net = basic_amount + allowances_amount - deductions_amount`; `CHECK (net >= 0)` | Preserve one salary snapshot per effective date, calculate values once in PostgreSQL, and enforce no negative net at storage level. |
 | `salary_versions` | Index `(employee_id, effective_date DESC)` | Load current and historical salary versions efficiently. |
 | `activity_log` | PK; required actor/action/time; optional employee FK using `ON DELETE SET NULL`; action `CHECK`; no update/delete API | Preserve history if a target is unavailable; keep the activity view read-only. |
 | `activity_log` | Index `(occurred_at DESC, activity_id DESC)` and `(employee_id, occurred_at DESC)` | Support the newest-first activity screen and employee-specific history. |
 
 The work email uniqueness rule is case-insensitive. Normalize whitespace and case in the service and keep a unique expression index as the final guard. Use stable ordering with an ID tie-breaker for pagination. Do not add `pg_trgm` or other extensions until 10,000-row measurements show a need.
+
+PostgreSQL generated expressions cannot reference another generated column. Therefore `net` uses the algebraically equivalent base-column expression `basic_amount + allowances_amount - deductions_amount`; it equals `gross - deductions_amount`. Insights and tests read the stored `gross` and `net` columns. See [PostgreSQL generated-column restrictions](https://www.postgresql.org/docs/17/ddl-generated-columns.html).
 
 ### Tables deliberately omitted
 
@@ -134,9 +162,9 @@ All endpoints are under `/api`. Paginated endpoints cap `size` at 100 and return
 | `PUT /employees/{id}` | Edit employee fields | Same field and uniqueness checks as create; return field errors; never alter prior salary versions. |
 | `DELETE /employees/{id}` | Archive employee (soft delete) | Set `archived_at`; repeated archive is safe; preserve salary history and audit trail. |
 | `GET /employees/{id}/salary-history` | Read salary versions newest-first | 404 for unknown employee; currency and effective date included. |
-| `POST /employees/{id}/salary-history` | Append salary version | Require effective date after latest version, nonnegative amounts, supported currency, and deductions no greater than gross; calculate gross/net in service. |
+| `POST /employees/{id}/salary-history` | Append salary version | Require effective date after latest version, nonnegative amounts, supported currency, and deductions no greater than gross; PostgreSQL generates and stores gross/net. |
 | `GET /insights/pay` | Aggregate average, median, min, max, and range by selected dimension | `groupBy` allowlist: country, department, job title; include currency in every group; ignore archived or missing salary. |
-| `GET /insights/outliers` | List gross-pay outliers within country/department/job-title/currency role groups | IQR rule; require at least five records; omit undersized groups. |
+| `GET /insights/outliers` | List gross-pay outliers within job-title/country/currency groups | Use this grouping everywhere; IQR rule; require at least five salaries in each group; omit undersized groups. |
 | `GET /imports/template` | Download `.xlsx` template | Include documented columns and example-free headers. |
 | `POST /imports/preview` | Validate uploaded workbook and return row-level preview/errors | Multipart `.xlsx`; file/row limits; no writes; reject malformed headers, invalid dates/amounts, duplicate IDs/emails, and unsupported country/currency. |
 | `POST /imports/confirm` | Re-upload, revalidate, and atomically create all rows | No batch ID or stored preview. Any invalid row means zero writes. Recheck DB uniqueness inside the transaction. |
@@ -198,7 +226,7 @@ flowchart TD
 1. HR chooses country, department, or job title and filters in `/insights`.
 2. Angular calls `GET /api/insights/pay`; PostgreSQL groups amounts by dimension and currency.
 3. The UI shows average, median, min, max/range, and sample size. It never adds or compares different currency amounts.
-4. HR opens outliers; `GET /api/insights/outliers` applies IQR only to role groups with at least five salaries.
+4. HR opens outliers; `GET /api/insights/outliers` applies IQR to groups keyed by job title, country, and currency, with at least five salaries per group.
 
 ### Import a spreadsheet and fix errors
 
@@ -232,13 +260,17 @@ There is no login, so the app cannot prove a human identity. For the synthetic p
 - **Database-side work:** filtering, pagination, export selection, median, and aggregates stay in PostgreSQL. Add indexes after measuring seeded queries.
 - **Low-cost deployment:** Render/Netlify are fast to publish. Render Free has sleeping services and a 30-day database lifetime; keep it for a short assessment demo and re-evaluate if the app must remain available longer.
 
-## Open questions and suggested defaults
+## Confirmed design decisions
 
-1. **Who is the audit actor without login?** Default: one configured `assessment-hr-manager` demo actor, labeled as unverified.
-2. **May a salary version use a currency different from the employee's country default?** Default: no; require the configured country currency for a new salary. Keep currency on each snapshot for history.
-3. **What salary effective date is allowed?** Default: new effective date must be after the latest version; one version per employee per date.
-4. **What outlier minimum/rule applies?** Accepted default: IQR, minimum five comparable salaries within job title, country, and currency.
-5. **Should HR edit country and department reference lists?** Default: read-only seeded five countries and a short seeded department list; avoid reference-data administration until requested.
-6. **How long must the public demo stay online?** Default: assessment window only; use Render Free and recreate/upgrade before its 30-day Postgres expiry if continued access is required.
+- The audit actor is a server-configured `assessment-hr-manager` demo identity. It is labeled as unverified because role-based login is out of scope.
+- New salary versions must use the employee country’s configured currency. Each salary snapshot stores its currency.
+- A new salary effective date must be later than the latest version. One version per employee per effective date.
+- Outliers are grouped by job title, country, and currency everywhere. Use IQR and require at least five salaries in each group.
+- The five supported countries and department list are seeded reference data and read-only in this version.
+- Keep the public demo available for the assessment window. Render Free is acceptable for the short review window; re-create or upgrade before its free database expires if longer access is needed.
+
+## Seed distribution and identifiers
+
+Generate exactly 10,000 fictional employees. Use five countries, ten seeded job titles per country, and 200 employees in every job-title/country/currency group. This makes every role group large enough for the minimum-five outlier rule. Department distribution remains deterministic within those groups. Derive each employee UUID with UUID version 5 from a fixed namespace and the employee number, so repeated seed runs produce identical IDs. Keep the seed command idempotent and separate from the small Playwright fixture reset.
 
 The root `requirements.md`, README, and other earlier project notes may still contain older stack statements. This design uses `docs/requirements.md` as the current requirements document; update the remaining project notes only after this design is confirmed.
