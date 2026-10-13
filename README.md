@@ -74,3 +74,5 @@ Render's free PostgreSQL tier is temporary and the free API may sleep. Use the p
 ## Submission
 
 The submission includes this repository, a public synthetic-data deployment, test/report artifacts, committed design and AI notes, and a demo video. The repository is private; grant reviewer access before sharing its link.
+
+Track remaining external setup in [`docs/submission-checklist.md`](docs/submission-checklist.md). Use [`docs/demo-script.md`](docs/demo-script.md) to record the public walkthrough after deployment and CI verification.
