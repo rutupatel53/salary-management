@@ -14,6 +14,15 @@ class GlobalExceptionHandlerTest {
     private final GlobalExceptionHandler handler = new GlobalExceptionHandler();
 
     @Test
+    void oversizedUploadReturns413WithMatchingEnvelope() {
+        ResponseEntity<ApiResponse<Void>> response = handler.uploadTooLarge();
+
+        assertEquals(HttpStatus.PAYLOAD_TOO_LARGE, response.getStatusCode());
+        assertEquals(413, response.getBody().status());
+        assertFalse(response.getBody().success());
+    }
+
+    @Test
     void notFoundUsesHttpStatusAndTheSharedErrorEnvelope() {
         ResponseEntity<ApiResponse<Void>> response = handler.notFound(new NotFoundException("Employee not found."));
 

@@ -23,7 +23,8 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.jdbc.core.JdbcTemplate;
+import com.acme.salary.repository.EmployeeImportRepository;
+import com.acme.salary.dto.PreparedImportRow;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -53,14 +54,13 @@ public class ExcelImportServiceImpl implements ExcelImportService {
 
     private static final int MAX_BYTES = 5 * 1024 * 1024;
     private static final int MAX_ROWS = 500;
-    private static final int BATCH_SIZE = 100;
     private static final Pattern EMPLOYEE_NUMBER = Pattern.compile("[A-Za-z0-9-]{2,24}");
 
     private final EmployeeRepository employeeRepository;
     private final CountryRepository countryRepository;
     private final DepartmentRepository departmentRepository;
     private final Validator validator;
-    private final JdbcTemplate jdbcTemplate;
+    private final EmployeeImportRepository importRepository;
     private final AuditService auditService;
 
     public ExcelImportServiceImpl(
@@ -68,13 +68,13 @@ public class ExcelImportServiceImpl implements ExcelImportService {
             CountryRepository countryRepository,
             DepartmentRepository departmentRepository,
             Validator validator,
-            JdbcTemplate jdbcTemplate,
+            EmployeeImportRepository importRepository,
             AuditService auditService) {
         this.employeeRepository = employeeRepository;
         this.countryRepository = countryRepository;
         this.departmentRepository = departmentRepository;
         this.validator = validator;
-        this.jdbcTemplate = jdbcTemplate;
+        this.importRepository = importRepository;
         this.auditService = auditService;
     }
 
@@ -110,49 +110,11 @@ public class ExcelImportServiceImpl implements ExcelImportService {
             throw new ImportValidationException(preview);
         }
 
-        List<PreparedRow> rows = validation.preparedRows();
-        insertEmployees(rows);
-        insertSalaryVersions(rows);
+        List<PreparedImportRow> rows = validation.preparedRows();
+        importRepository.insertEmployees(rows);
+        importRepository.insertSalaryVersions(rows);
         auditService.record("IMPORT_CONFIRMED", null, Map.of("rowCount", rows.size()));
         return new ImportConfirmResponse(rows.size(), "Import completed.");
-    }
-
-    private void insertEmployees(List<PreparedRow> rows) {
-        String sql = """
-                INSERT INTO employees (
-                    employee_id, employee_number, first_name, last_name, work_email, hire_date,
-                    country_code, department_id, job_title)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """;
-        jdbcTemplate.batchUpdate(sql, rows, BATCH_SIZE, (statement, row) -> {
-            statement.setObject(1, row.employeeId());
-            statement.setString(2, row.employee().employeeNumber());
-            statement.setString(3, row.employee().firstName());
-            statement.setString(4, row.employee().lastName());
-            statement.setString(5, row.employee().workEmail());
-            statement.setObject(6, row.employee().hireDate());
-            statement.setString(7, row.employee().countryCode());
-            statement.setObject(8, row.department().getId());
-            statement.setString(9, row.employee().jobTitle());
-        });
-    }
-
-    private void insertSalaryVersions(List<PreparedRow> rows) {
-        String sql = """
-                INSERT INTO salary_versions (
-                    salary_version_id, employee_id, effective_date, currency_code,
-                    basic_amount, allowances_amount, deductions_amount)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-                """;
-        jdbcTemplate.batchUpdate(sql, rows, BATCH_SIZE, (statement, row) -> {
-            statement.setObject(1, row.salaryVersionId());
-            statement.setObject(2, row.employeeId());
-            statement.setObject(3, row.salary().effectiveDate());
-            statement.setString(4, row.salary().currencyCode());
-            statement.setBigDecimal(5, row.salary().basic());
-            statement.setBigDecimal(6, row.salary().allowances());
-            statement.setBigDecimal(7, row.salary().deductions());
-        });
     }
 
     private Validation validate(MultipartFile file) {
@@ -225,7 +187,7 @@ public class ExcelImportServiceImpl implements ExcelImportService {
         Set<String> existingWorkEmails = candidates.workEmails().isEmpty()
                 ? Set.of() : employeeRepository.findExistingWorkEmails(candidates.workEmails());
 
-        List<PreparedRow> preparedRows = new ArrayList<>();
+        List<PreparedImportRow> preparedRows = new ArrayList<>();
         List<ImportRowResult> results = new ArrayList<>();
         Map<String, Integer> seenNumbers = new HashMap<>();
         Map<String, Integer> seenEmails = new HashMap<>();
@@ -258,7 +220,7 @@ public class ExcelImportServiceImpl implements ExcelImportService {
             Set<String> existingWorkEmails,
             Map<String, Integer> seenNumbers,
             Map<String, Integer> seenEmails,
-            List<PreparedRow> preparedRows,
+            List<PreparedImportRow> preparedRows,
             List<ImportRowResult> results) {
         List<String> errors = new ArrayList<>();
         String employeeNumber = cellText(row.getCell(0), formatter).trim();
@@ -312,7 +274,7 @@ public class ExcelImportServiceImpl implements ExcelImportService {
                     money(basic), money(allowances), money(deductions), currency, effectiveDate);
             validator.validate(salary).forEach(violation -> errors.add(validationMessage(violation)));
             if (errors.isEmpty()) {
-                preparedRows.add(new PreparedRow(UUID.randomUUID(), UUID.randomUUID(), employee, salary, department));
+                preparedRows.add(new PreparedImportRow(UUID.randomUUID(), UUID.randomUUID(), employee, salary));
             }
         }
         results.add(new ImportRowResult(rowNumber, employeeNumber, errors.isEmpty(), List.copyOf(errors)));
@@ -421,14 +383,7 @@ public class ExcelImportServiceImpl implements ExcelImportService {
         return new Validation(response, List.of());
     }
 
-    private record PreparedRow(
-            UUID employeeId,
-            UUID salaryVersionId,
-            EmployeeRequest employee,
-            SalaryChangeRequest salary,
-            Department department) { }
-
-    private record Validation(ImportPreviewResponse response, List<PreparedRow> preparedRows) { }
+    private record Validation(ImportPreviewResponse response, List<PreparedImportRow> preparedRows) { }
 
     private record IdentityCandidates(Set<String> employeeNumbers, Set<String> workEmails) { }
 }

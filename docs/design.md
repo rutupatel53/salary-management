@@ -274,3 +274,13 @@ There is no login, so the app cannot prove a human identity. For the synthetic p
 Generate exactly 10,000 fictional employees. Use five countries, ten seeded job titles per country, and 200 employees in every job-title/country/currency group. This makes every role group large enough for the minimum-five outlier rule. Department distribution remains deterministic within those groups. Derive each employee UUID with UUID version 5 from a fixed namespace and the employee number, so repeated seed runs produce identical IDs. Keep the seed command idempotent and separate from the small Playwright fixture reset.
 
 The root `requirements.md`, README, and other earlier project notes may still contain older stack statements. This design uses `docs/requirements.md` as the current requirements document; update the remaining project notes only after this design is confirmed.
+
+
+## Backend layering review (14 October 2026)
+
+- Controllers use service interfaces and typed response DTOs. Reference lists use database DTO projections with ordering and active-department filtering in the query.
+- InsightsRepository owns PostgreSQL aggregate and outlier SQL. SalaryExportRepository selects current salaries for one employee page. EmployeeImportRepository owns both batch inserts and requires an existing transaction.
+- Services own business validation, transaction boundaries, and audit orchestration. No service in the application service package directly uses JdbcTemplate.
+- Import parsing necessarily iterates workbook cells. It is limited to 500 rows and uses bulk identity checks. Export iterates pages of 500 records and writes a streaming workbook. These loops do not replace database filters.
+- Keep constructor injection and centralized exception advice. JSON error status matches HTTP status, including HTTP 413 for multipart uploads over the configured limit. Downloads retain their binary response type.
+- Local server version checked: PostgreSQL 16.15. Compose, CI, and Render configuration target major version 16.

@@ -43,7 +43,7 @@ class ExcelImportServiceImplTest {
         employees = mock(EmployeeRepository.class); countries = mock(CountryRepository.class);
         departments = mock(DepartmentRepository.class); jdbc = mock(JdbcTemplate.class); audit = mock(AuditService.class);
         validatorFactory = Validation.buildDefaultValidatorFactory(); validator = validatorFactory.getValidator();
-        service = new ExcelImportServiceImpl(employees, countries, departments, validator, jdbc, audit);
+        service = new ExcelImportServiceImpl(employees, countries, departments, validator, new com.acme.salary.repository.EmployeeImportRepository(jdbc), audit);
         Department department = mock(Department.class); when(department.getId()).thenReturn(UUID.fromString("00000000-0000-5000-8000-000000000001"));
         when(department.getName()).thenReturn("Engineering");
         when(departments.findByActiveTrueOrderByName()).thenReturn(List.of(department));

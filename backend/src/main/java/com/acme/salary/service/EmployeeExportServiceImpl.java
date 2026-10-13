@@ -9,18 +9,14 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.jdbc.core.JdbcTemplate;
+import com.acme.salary.repository.SalaryExportRepository;
+import com.acme.salary.repository.SalaryExportRepository.SalaryExport;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayOutputStream;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class EmployeeExportServiceImpl implements EmployeeExportService {
@@ -31,23 +27,14 @@ public class EmployeeExportServiceImpl implements EmployeeExportService {
             "Salary Effective Date"
     };
 
-    private static final String LATEST_SALARY_SQL = """
-            SELECT DISTINCT ON (employee_id)
-                   employee_id, currency_code, basic_amount, allowances_amount, deductions_amount,
-                   gross, net, effective_date
-            FROM salary_versions
-            WHERE employee_id IN (%s) AND effective_date <= CURRENT_DATE
-            ORDER BY employee_id, effective_date DESC
-            """;
-
     private final EmployeeRepository employeeRepository;
-    private final JdbcTemplate jdbcTemplate;
+    private final SalaryExportRepository salaryExportRepository;
     private final AuditService auditService;
 
     public EmployeeExportServiceImpl(
-            EmployeeRepository employeeRepository, JdbcTemplate jdbcTemplate, AuditService auditService) {
+            EmployeeRepository employeeRepository, SalaryExportRepository salaryExportRepository, AuditService auditService) {
         this.employeeRepository = employeeRepository;
-        this.jdbcTemplate = jdbcTemplate;
+        this.salaryExportRepository = salaryExportRepository;
         this.auditService = auditService;
     }
 
@@ -71,7 +58,7 @@ public class EmployeeExportServiceImpl implements EmployeeExportService {
                     break;
                 }
 
-                Map<UUID, SalaryExport> salaries = latestSalaries(
+                Map<UUID, SalaryExport> salaries = salaryExportRepository.findCurrentByEmployeeIds(
                         page.getContent().stream().map(Employee::getId).toList());
                 for (Employee employee : page.getContent()) {
                     writeEmployee(sheet.createRow(excelRowNumber++), employee, salaries.get(employee.getId()));
@@ -120,35 +107,4 @@ public class EmployeeExportServiceImpl implements EmployeeExportService {
         row.createCell(14).setCellValue(salary.effectiveDate().toString());
     }
 
-    private Map<UUID, SalaryExport> latestSalaries(List<UUID> employeeIds) {
-        if (employeeIds.isEmpty()) {
-            return Map.of();
-        }
-        String placeholders = employeeIds.stream().map(id -> "?").collect(Collectors.joining(","));
-        String sql = LATEST_SALARY_SQL.formatted(placeholders);
-        return jdbcTemplate.query(sql, resultSet -> {
-            Map<UUID, SalaryExport> salaries = new HashMap<>();
-            while (resultSet.next()) {
-                UUID employeeId = resultSet.getObject("employee_id", UUID.class);
-                salaries.put(employeeId, new SalaryExport(
-                        resultSet.getString("currency_code"),
-                        resultSet.getBigDecimal("basic_amount"),
-                        resultSet.getBigDecimal("allowances_amount"),
-                        resultSet.getBigDecimal("deductions_amount"),
-                        resultSet.getBigDecimal("gross"),
-                        resultSet.getBigDecimal("net"),
-                        resultSet.getDate("effective_date").toLocalDate()));
-            }
-            return salaries;
-        }, employeeIds.toArray());
-    }
-
-    private record SalaryExport(
-            String currency,
-            BigDecimal basic,
-            BigDecimal allowances,
-            BigDecimal deductions,
-            BigDecimal gross,
-            BigDecimal net,
-            LocalDate effectiveDate) { }
 }
