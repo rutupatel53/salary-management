@@ -21,6 +21,7 @@ test('@functional employee can be created, edited, searched, and archived', asyn
   await page.getByRole('option', { name: 'Engineering' }).click();
   await page.getByTestId('employee-form-title').fill('Test Engineer');
   await page.getByTestId('save-employee').click();
+  await expect(page.getByRole('dialog', { name: /employee/i })).toHaveCount(0);
 
   await page.getByTestId('employee-search').fill('PW-E2E-901');
   await page.getByTestId('employee-search').press('Enter');
@@ -30,6 +31,7 @@ test('@functional employee can be created, edited, searched, and archived', asyn
   await page.getByTestId('edit-PW-E2E-901').click();
   await page.getByTestId('employee-form-first-name').fill('Arianna');
   await page.getByTestId('save-employee').click();
+  await expect(page.getByRole('dialog', { name: /employee/i })).toHaveCount(0);
   await expect(row).toContainText('Arianna Example');
 
   await page.getByTestId('archive-PW-E2E-901').click();
@@ -38,4 +40,23 @@ test('@functional employee can be created, edited, searched, and archived', asyn
   await expect(row).toHaveCount(0);
   const archived = await request.get(`${apiURL}/employees?q=PW-E2E-901&page=0&size=10`);
   expect((await archived.json()).data.totalItems).toBe(0);
+});
+
+
+test('@functional employee modal validates required fields and confirms discarded changes', async ({ page }) => {
+  await page.goto('/employees');
+  await page.getByTestId('add-employee').click();
+  const dialog = page.getByRole('dialog', { name: 'Add employee', exact: true });
+  await expect(dialog).toBeVisible();
+  await page.getByTestId('save-employee').click();
+  await expect(dialog.getByText('Enter a valid employee number.')).toBeVisible();
+  await page.getByTestId('employee-form-first-name').fill('Unsaved');
+  await page.getByTestId('cancel-employee').click();
+  await expect(page.getByTestId('confirm-title')).toHaveText('Discard changes?');
+  await page.getByTestId('cancel-action').click();
+  await expect(page.getByTestId('employee-form-first-name')).toHaveValue('Unsaved');
+  await page.getByTestId('cancel-employee').click();
+  await page.getByTestId('confirm-action').click();
+  await expect(dialog).toHaveCount(0);
+  await expect(page.getByTestId('add-employee')).toBeFocused();
 });
