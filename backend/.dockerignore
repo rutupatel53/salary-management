@@ -1,4 +1,5 @@
-target/
-.m2/
-data/
-*.log
+target
+.git
+.idea
+*.iml
+.env
