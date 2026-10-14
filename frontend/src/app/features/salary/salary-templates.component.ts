@@ -14,8 +14,10 @@ import { SalaryTemplate, SalaryWorkspaceApiService } from './salary-workspace-ap
 import { TemplateEditorComponent } from './template-editor.component';
 import { AppIconComponent } from '../../shared/app-icon.component';
 import { PageGuideComponent } from '../../shared/page-guide.component';
+import { TextFieldComponent } from '../../shared/form-controls/text-field.component';
+import { DropdownComponent } from '../../shared/form-controls/dropdown.component';
 
-@Component({selector:'app-salary-templates',standalone:true,imports:[CommonModule,FormsModule,RouterLink,MatButtonModule,MatTooltipModule,StatusBadgeComponent,ServerPagedTableComponent,AppIconComponent,PageGuideComponent],templateUrl:'./salary-templates.component.html',styleUrl:'./salary-workspace.css',changeDetection:ChangeDetectionStrategy.OnPush})
+@Component({selector:'app-salary-templates',standalone:true,imports:[CommonModule,FormsModule,RouterLink,MatButtonModule,MatTooltipModule,StatusBadgeComponent,ServerPagedTableComponent,AppIconComponent,PageGuideComponent,TextFieldComponent,DropdownComponent],templateUrl:'./salary-templates.component.html',styleUrl:'./salary-workspace.css',changeDetection:ChangeDetectionStrategy.OnPush})
 export class SalaryTemplatesComponent {
  private readonly api=inject(SalaryWorkspaceApiService);
  private readonly references=inject(EmployeeApiService);

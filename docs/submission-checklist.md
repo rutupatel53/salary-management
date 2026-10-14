@@ -1,8 +1,8 @@
 # Submission checklist
 
-Updated: 2026-10-14
+Updated: 2026-10-15
 
-Verification on 2026-10-14: PostgreSQL 16.15, the Java 17 API, and Angular UI run locally in an isolated Compose project. All three Flyway migrations pass; the deterministic seed has exactly 10,000 employees. Backend JUnit passed 28 tests. The latest Angular build and 13 unit tests pass, and Playwright functional passes 13/13 plus sanity 3/3 with the responsive hamburger menu, salary-template icons and tooltips, and page guides. Render provisioning and public deployment remain blocked on connecting the Render account/repository.
+Verification through 2026-10-15: PostgreSQL 16.15, the Java 17 API, and Angular UI run locally in an isolated Compose project. All three Flyway migrations pass; the deterministic seed has exactly 10,000 employees. Backend JUnit passed 28 tests. The shared text-field/dropdown migration passes the latest Angular build, 17 unit tests, and Playwright functional 14/14. The earlier sanity run passed 3/3. Render provisioning and public deployment remain blocked on connecting the Render account/repository.
 
 ## Ready in the repository
 

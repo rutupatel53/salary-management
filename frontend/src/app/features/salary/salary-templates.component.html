@@ -1,22 +1,8 @@
 <section class="page-heading"><div><span class="eyebrow">SALARY SETUP</span><h1>Salary templates</h1><p>Create reusable salary rules, then assign them with each employee's CTC.</p></div><div class="actions"><a mat-stroked-button routerLink="/salary-assignments">Assign salary</a><button mat-flat-button (click)="edit()" data-testid="create-template">Create template</button></div></section>
 <app-page-guide><p>Create a country and currency-specific template once, then reuse it for matching employees.</p><ol><li>Set components and save as draft.</li><li>Activate the reviewed template.</li><li>Apply template with CTC and start date.</li></ol></app-page-guide>
 <div class="template-filters" role="search" aria-label="Filter salary templates">
-  <div class="form-control">
-    <label for="template-search">Search templates</label>
-    <div class="input-with-icon">
-      <app-icon name="search" />
-      <input id="template-search" type="search" [(ngModel)]="q" (keyup.enter)="search()" placeholder="Search by template name" data-testid="template-search">
-    </div>
-  </div>
-  <div class="form-control">
-    <label for="template-status-filter">Status</label>
-    <select id="template-status-filter" [(ngModel)]="status" (ngModelChange)="search()" data-testid="template-status-filter">
-      <option value="">All statuses</option>
-      <option value="ACTIVE">Active</option>
-      <option value="DRAFT">Draft</option>
-      <option value="ARCHIVED">Archived</option>
-    </select>
-  </div>
+  <app-text-field label="Search templates" type="search" icon="search" [(ngModel)]="q" (keyup.enter)="search()" placeholder="Search by template name" testId="template-search"></app-text-field>
+  <app-dropdown label="Status" [(ngModel)]="status" (ngModelChange)="search()" emptyLabel="All statuses" [options]="[{value:'ACTIVE',label:'Active'},{value:'DRAFT',label:'Draft'},{value:'ARCHIVED',label:'Archived'}]" testId="template-status-filter"></app-dropdown>
   <button mat-flat-button type="button" (click)="search()" data-testid="search-templates">Search</button>
 </div>
 <p *ngIf="error" class="error-banner" role="alert">{{error}}</p><p *ngIf="loading" role="status">Loading templates…</p>

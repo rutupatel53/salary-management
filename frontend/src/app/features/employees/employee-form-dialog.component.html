@@ -1,38 +1,14 @@
 <app-dialog-shell [title]="data.employee ? 'Edit employee' : 'Add employee'" description="Keep employee details accurate. All fields are required.">
   <div *ngIf="error" class="error" role="alert" data-testid="employee-form-error">{{ error }}</div>
   <form id="employee-editor" [formGroup]="form" (ngSubmit)="save()" data-testid="employee-form" class="fields">
-    <mat-form-field appearance="outline"><mat-label>Employee number</mat-label>
-      <input matInput type="text" formControlName="employeeNumber" data-testid="employee-form-number">
-      <mat-error>{{ form.controls.employeeNumber.getError("server") || "Enter a valid employee number." }}</mat-error>
-    </mat-form-field>
-    <mat-form-field appearance="outline"><mat-label>First name</mat-label>
-      <input matInput type="text" formControlName="firstName" data-testid="employee-form-first-name">
-      <mat-error>{{ form.controls.firstName.getError("server") || "Enter a valid first name." }}</mat-error>
-    </mat-form-field>
-    <mat-form-field appearance="outline"><mat-label>Last name</mat-label>
-      <input matInput type="text" formControlName="lastName" data-testid="employee-form-last-name">
-      <mat-error>{{ form.controls.lastName.getError("server") || "Enter a valid last name." }}</mat-error>
-    </mat-form-field>
-    <mat-form-field appearance="outline"><mat-label>Work email</mat-label>
-      <input matInput type="email" formControlName="workEmail" data-testid="employee-form-email">
-      <mat-error>{{ form.controls.workEmail.getError("server") || "Enter a valid work email." }}</mat-error>
-    </mat-form-field>
-    <mat-form-field appearance="outline"><mat-label>Hire date</mat-label>
-      <input matInput type="date" formControlName="hireDate" data-testid="employee-form-hire-date">
-      <mat-error>{{ form.controls.hireDate.getError("server") || "Enter a valid hire date." }}</mat-error>
-    </mat-form-field>
-    <mat-form-field appearance="outline"><mat-label>Country</mat-label>
-      <mat-select formControlName="countryCode" data-testid="employee-form-country"><mat-option *ngFor="let c of data.countries" [value]="c.countryCode">{{ c.name }} ({{ c.currencyCode }})</mat-option></mat-select>
-      <mat-error>{{ form.controls.countryCode.getError("server") || "Enter a valid country." }}</mat-error>
-    </mat-form-field>
-    <mat-form-field appearance="outline"><mat-label>Department</mat-label>
-      <mat-select formControlName="departmentId" data-testid="employee-form-department"><mat-option *ngFor="let d of data.departments" [value]="d.id">{{ d.name }}</mat-option></mat-select>
-      <mat-error>{{ form.controls.departmentId.getError("server") || "Enter a valid department." }}</mat-error>
-    </mat-form-field>
-    <mat-form-field appearance="outline"><mat-label>Job title</mat-label>
-      <input matInput type="text" formControlName="jobTitle" data-testid="employee-form-title">
-      <mat-error>{{ form.controls.jobTitle.getError("server") || "Enter a valid job title." }}</mat-error>
-    </mat-form-field>
+    <app-text-field label="Employee number" type="text" formControlName="employeeNumber" testId="employee-form-number" errorMessage="Enter a valid employee number." [required]="true"></app-text-field>
+    <app-text-field label="First name" type="text" formControlName="firstName" testId="employee-form-first-name" errorMessage="Enter a valid first name." [required]="true"></app-text-field>
+    <app-text-field label="Last name" type="text" formControlName="lastName" testId="employee-form-last-name" errorMessage="Enter a valid last name." [required]="true"></app-text-field>
+    <app-text-field label="Work email" type="email" formControlName="workEmail" testId="employee-form-email" errorMessage="Enter a valid work email." [required]="true"></app-text-field>
+    <app-text-field label="Hire date" type="date" formControlName="hireDate" testId="employee-form-hire-date" errorMessage="Enter a valid hire date." [required]="true"></app-text-field>
+    <app-dropdown label="Country" formControlName="countryCode" testId="employee-form-country" [options]="data.countries | dropdownOptions:'countryCode':'name':'currencyCode'" [required]="true" errorMessage="Enter a valid country."></app-dropdown>
+    <app-dropdown label="Department" formControlName="departmentId" testId="employee-form-department" [options]="data.departments | dropdownOptions:'id':'name'" [required]="true" errorMessage="Enter a valid department."></app-dropdown>
+    <app-text-field label="Job title" type="text" formControlName="jobTitle" testId="employee-form-title" errorMessage="Enter a valid job title." [required]="true"></app-text-field>
   </form>
   <ng-container dialogActions>
     <button mat-button type="button" [disabled]="saving || confirming" (click)="cancel()" data-testid="cancel-employee">Cancel</button>

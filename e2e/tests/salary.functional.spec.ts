@@ -15,7 +15,9 @@ test('@functional HR creates a template and assigns salary directly by employee 
   const editTemplate = page.getByRole('button', { name: 'View or edit PW-Standard' });
   await expect(editTemplate).toBeVisible();
   await editTemplate.hover();
-  await expect(page.locator('.mat-mdc-tooltip-surface')).toHaveText('View or edit template');
+  const tooltip = page.locator('.mat-mdc-tooltip-surface:visible').filter({ hasText: 'View or edit template' });
+  await expect(tooltip).toHaveCount(1);
+  await expect(tooltip).toHaveText('View or edit template');
   await expect(page.getByRole('button', { name: 'Copy PW-Standard as a new draft' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Assign PW-Standard to an employee' })).toBeVisible();
   await page.goto('/salary-assignments');

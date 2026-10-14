@@ -7,7 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
   imports: [MatButtonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `<section class="filters" role="search" data-testid="filter-bar"><ng-content></ng-content><button mat-button type="button" (click)="clear.emit()" data-testid="clear-filters">Clear filters</button></section>`,
-  styles: [`.filters{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:8px 0 14px}.filters mat-form-field{min-width:200px}@media(max-width:720px){.filters mat-form-field{flex:1 1 100%;min-width:0}}`]
+  styles: [`.filters{display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap;margin:8px 0 20px}`]
 })
 export class FilterBarComponent {
   clear = output<void>();

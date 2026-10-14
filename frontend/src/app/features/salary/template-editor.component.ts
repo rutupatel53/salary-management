@@ -1,11 +1,11 @@
+import { TextFieldComponent } from '../../shared/form-controls/text-field.component';
+import { DropdownComponent } from '../../shared/form-controls/dropdown.component';
+import { DropdownOptionsPipe } from '../../shared/form-controls/dropdown-options.pipe';
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
 import { firstValueFrom } from 'rxjs';
 import { DialogShellComponent } from '../../shared/dialog-shell.component';
 import { ConfirmDialogService } from '../../shared/confirm-dialog.service';
@@ -14,7 +14,7 @@ import { SalaryTemplate, SalaryWorkspaceApiService, TemplateComponent } from './
 
 @Component({
  selector: 'app-template-editor', standalone: true,
- imports: [CommonModule, FormsModule, MatButtonModule, MatFormFieldModule, MatInputModule, MatSelectModule, DialogShellComponent],
+ imports: [TextFieldComponent, DropdownComponent, DropdownOptionsPipe, CommonModule, FormsModule, MatButtonModule, DialogShellComponent],
  templateUrl: './template-editor.component.html', styleUrl: './salary-workspace.css', changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TemplateEditorComponent {
@@ -25,6 +25,8 @@ export class TemplateEditorComponent {
  private readonly cdr = inject(ChangeDetectorRef);
  readonly categories = ['BASIC', 'ALLOWANCE', 'EMPLOYER_CONTRIBUTION', 'DEDUCTION'];
  readonly calculations = ['FIXED', 'PERCENT_CTC', 'PERCENT_BASIC', 'BALANCE'];
+ readonly categoryOptions = this.categories.map(value => ({ value, label: this.label(value) }));
+ readonly calculationOptions = this.calculations.map(value => ({ value, label: this.label(value) }));
  model: Partial<SalaryTemplate>;
  error = '';
  saving = false;

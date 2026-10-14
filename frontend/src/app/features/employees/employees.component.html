@@ -2,10 +2,10 @@
 <app-page-guide><p>Search and filter the directory, then open a record to edit details or assign salary.</p><ol><li>Use the filters to narrow the list.</li><li>Add or edit employee details; archive only when needed.</li><li>Use Assign salary to set pay from a reusable template.</li></ol></app-page-guide>
 <div class="notice" role="status" *ngIf="notice.message()">{{notice.message()}}</div>
 <app-filter-bar (clear)="clearFilters()">
- <mat-form-field appearance="outline"><mat-label>Search</mat-label><input matInput data-testid="employee-search" [(ngModel)]="filters.q" (keyup.enter)="applyFilters()" placeholder="Name, email, number or title"></mat-form-field>
- <mat-form-field appearance="outline"><mat-label>Country</mat-label><mat-select [(ngModel)]="filters.country" (selectionChange)="applyFilters()"><mat-option value="">All countries</mat-option><mat-option *ngFor="let c of countries" [value]="c.countryCode">{{c.name}}</mat-option></mat-select></mat-form-field>
- <mat-form-field appearance="outline"><mat-label>Department</mat-label><mat-select [(ngModel)]="filters.department" (selectionChange)="applyFilters()"><mat-option value="">All departments</mat-option><mat-option *ngFor="let d of departments" [value]="d.id">{{d.name}}</mat-option></mat-select></mat-form-field>
- <mat-form-field appearance="outline"><mat-label>Job title</mat-label><input matInput data-testid="employee-job-title" [(ngModel)]="filters.jobTitle" (keyup.enter)="applyFilters()"></mat-form-field>
+ <app-text-field label="Search" testId="employee-search" [(ngModel)]="filters.q" (keyup.enter)="applyFilters()" placeholder="Name, email, number or title"></app-text-field>
+ <app-dropdown label="Country" [(ngModel)]="filters.country" (ngModelChange)="applyFilters()" emptyLabel="All countries" [options]="countries | dropdownOptions:'countryCode':'name'" testId="employees-country"></app-dropdown>
+ <app-dropdown label="Department" [(ngModel)]="filters.department" (ngModelChange)="applyFilters()" emptyLabel="All departments" [options]="departments | dropdownOptions:'id':'name'" testId="employees-department"></app-dropdown>
+ <app-text-field label="Job title" testId="employee-job-title" [(ngModel)]="filters.jobTitle" (keyup.enter)="applyFilters()"></app-text-field>
  <button mat-stroked-button data-testid="apply-employee-filters" (click)="applyFilters()">Apply filters</button>
  </app-filter-bar>
 <app-error-state *ngIf="error" [message]="error"></app-error-state><app-loading-state *ngIf="loading" message="Loading employeesâ€¦" data-testid="loading"></app-loading-state>

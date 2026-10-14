@@ -1,3 +1,6 @@
+import { TextFieldComponent } from '../../shared/form-controls/text-field.component';
+import { DropdownComponent } from '../../shared/form-controls/dropdown.component';
+import { DropdownOptionsPipe } from '../../shared/form-controls/dropdown-options.pipe';
 import { StatusBadgeComponent } from '../../shared/status-badge.component';
 import { downloadFile } from '../../shared/download-file';
 import { CommonModule } from '@angular/common';
@@ -5,18 +8,15 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject } from '@
 import { FormsModule } from '@angular/forms';
 import { finalize } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
 import { ImportExportApiService, ImportPreview } from './import-export-api.service';
 import { NotificationService } from '../../core/notification.service';
 import { EmployeeApiService } from '../employees/employee-api.service';
 import { ReferenceCountry, ReferenceDepartment } from '../employees/employee.models';
-import { MatSelectModule } from '@angular/material/select';
 import { FileUploadBoxComponent } from '../../shared/file-upload-box.component';
 import { ErrorStateComponent } from '../../shared/error-state.component';
 import { PageGuideComponent } from '../../shared/page-guide.component';
 
-@Component({ selector: 'app-import-export', standalone: true, imports: [StatusBadgeComponent, CommonModule, FormsModule, MatButtonModule, MatFormFieldModule, MatInputModule, MatSelectModule, FileUploadBoxComponent, ErrorStateComponent, PageGuideComponent], templateUrl: './import-export.component.html', styleUrl: './import-export.component.css', changeDetection: ChangeDetectionStrategy.OnPush })
+@Component({ selector: 'app-import-export', standalone: true, imports: [TextFieldComponent, DropdownComponent, DropdownOptionsPipe, StatusBadgeComponent, CommonModule, FormsModule, MatButtonModule, FileUploadBoxComponent, ErrorStateComponent, PageGuideComponent], templateUrl: './import-export.component.html', styleUrl: './import-export.component.css', changeDetection: ChangeDetectionStrategy.OnPush })
 export class ImportExportComponent {
   private readonly api = inject(ImportExportApiService);
   private readonly references = inject(EmployeeApiService);

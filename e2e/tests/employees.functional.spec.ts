@@ -16,7 +16,7 @@ test('@functional employee can be created, edited, searched, and archived', asyn
   await page.getByTestId('employee-form-email').fill('pw-e2e-901@example.test');
   await page.getByTestId('employee-form-hire-date').fill('2024-03-12');
   await page.getByTestId('employee-form-country').click();
-  await page.getByRole('option', { name: 'India (INR)' }).click();
+  await page.getByRole('option', { name: 'India · INR' }).click();
   await page.getByTestId('employee-form-department').click();
   await page.getByRole('option', { name: 'Engineering' }).click();
   await page.getByTestId('employee-form-title').fill('Test Engineer');
@@ -61,6 +61,20 @@ test('@functional employee modal validates required fields and confirms discarde
   await expect(page.getByTestId('add-employee')).toBeFocused();
 });
 
+
+test('@functional shared dropdown supports keyboard selection and filters employees', async ({ page }) => {
+  await page.goto('/employees');
+  const country = page.getByTestId('employees-country');
+  await country.press('Enter');
+  await country.press('i');
+  await expect(page.getByRole('option', { name: 'India', exact: true })).toHaveClass(/mat-mdc-option-active/);
+  await country.press('Enter');
+  await expect(country).toContainText('India');
+  await expect(page.getByRole('listbox')).toHaveCount(0);
+  const rows = page.locator('[data-testid^="employee-row-"]');
+  await expect(rows.first()).toBeVisible();
+  for (const row of await rows.all()) await expect(row).toContainText('India');
+});
 
 test('@functional employee sort stays on the server and preserves search', async ({ page, request }) => {
   await page.goto('/employees');

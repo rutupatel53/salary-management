@@ -34,8 +34,10 @@
   gap: 14px;
 }
 
-.template-details mat-form-field,
-.assignment-fields mat-form-field {
+.template-details app-text-field,
+.template-details app-dropdown,
+.assignment-fields app-text-field,
+.assignment-fields app-dropdown {
   width: 100%;
   min-width: 0;
 }
@@ -44,12 +46,13 @@
 .component-editor {
   display: grid;
   grid-template-columns: 1.3fr 1.4fr 1.2fr .7fr auto;
-  align-items: center;
+  align-items: end;
   gap: 10px;
   min-width: 760px;
   padding: 12px 0;
   border-bottom: 1px solid var(--border);
 }
+.component-editor > button { height: 48px; }
 
 table { width: 100%; border-collapse: collapse; }
 table[data-testid="template-table"] { min-width: 760px; }
@@ -99,7 +102,8 @@ td.actions .mat-mdc-icon-button { flex: 0 0 40px; }
   align-items: start;
   gap: 20px;
 }
-.assignment-fields { display: grid; gap: 6px; }
+.assignment-fields { display: grid; gap: 16px; }
+.assignment-fields > button { height: 48px; }
 .step-label { color: var(--primary); font-size: 10px; font-weight: 700; letter-spacing: 1px; }
 .totals { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 18px 0; }
 .total { padding: 14px; border: 1px solid #e8eef8; border-radius: 9px; background: #f4f8fe; }
@@ -110,7 +114,7 @@ td.actions .mat-mdc-icon-button { flex: 0 0 40px; }
 .employee-summary h2 { margin: 0 0 7px; }
 
 @media (max-width: 900px) {
-  .component-editor { grid-template-columns: 1fr 1fr; }
+  .component-editor { min-width: 0; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
   .template-details,
   .assignment-grid { grid-template-columns: 1fr; }
   .component-editor > button { justify-self: end; }
@@ -126,7 +130,7 @@ td.actions .mat-mdc-icon-button { flex: 0 0 40px; }
   .component-editor { min-width: 0; grid-template-columns: 1fr; }
   .template-details,
   .toolbar { display: grid; grid-template-columns: 1fr; }
-  .toolbar > mat-form-field { width: 100%; }
+  .toolbar > app-text-field, .toolbar > app-dropdown { width: 100%; }
   .totals { grid-template-columns: 1fr; }
   .employee-option { align-items: flex-start; flex-direction: column; }
   td.actions { justify-content: flex-start; }

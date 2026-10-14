@@ -1,11 +1,11 @@
+import { TextFieldComponent } from '../../shared/form-controls/text-field.component';
+import { DropdownComponent } from '../../shared/form-controls/dropdown.component';
+import { DropdownOptionsPipe } from '../../shared/form-controls/dropdown-options.pipe';
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
 import { firstValueFrom } from 'rxjs';
 import { EmployeeApiService } from '../employees/employee-api.service';
 import { Employee } from '../employees/employee.models';
@@ -16,7 +16,7 @@ import { ConfirmDialogService } from '../../shared/confirm-dialog.service';
 import { SalaryWorkspaceApiService, SalaryTemplate, AssignmentRequest, AssignmentPreview } from './salary-workspace-api.service';
 import { PageGuideComponent } from '../../shared/page-guide.component';
 
-@Component({selector:'app-salary-assignments',standalone:true,imports:[CommonModule,FormsModule,RouterLink,MatButtonModule,MatFormFieldModule,MatInputModule,MatSelectModule,StatusBadgeComponent,PageGuideComponent],templateUrl:'./salary-assignments.component.html',styleUrl:'./salary-workspace.css',changeDetection:ChangeDetectionStrategy.OnPush})
+@Component({selector:'app-salary-assignments',standalone:true,imports:[TextFieldComponent, DropdownComponent, DropdownOptionsPipe, CommonModule,FormsModule,RouterLink,MatButtonModule,StatusBadgeComponent,PageGuideComponent],templateUrl:'./salary-assignments.component.html',styleUrl:'./salary-workspace.css',changeDetection:ChangeDetectionStrategy.OnPush})
 export class SalaryAssignmentsComponent {
  private readonly employees=inject(EmployeeApiService);
  private readonly salary=inject(SalaryApiService);

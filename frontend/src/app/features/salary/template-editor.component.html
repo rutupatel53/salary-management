@@ -1,16 +1,16 @@
 <app-dialog-shell [title]="model.id ? 'Edit salary template' : 'Create salary template'" eyebrow="SALARY SETUP" description="Define the rules once. Each employee gets their own CTC and dated salary snapshot.">
  <div *ngIf="error" class="error-banner" role="alert">{{error}}</div>
  <div class="template-details" (change)="dirty=true">
-  <mat-form-field appearance="outline"><mat-label>Template name</mat-label><input matInput [(ngModel)]="model.name" maxlength="100" data-testid="template-name"></mat-form-field>
-  <mat-form-field appearance="outline"><mat-label>Country and currency</mat-label><mat-select [(ngModel)]="model.countryCode" data-testid="template-country"><mat-option *ngFor="let c of data.countries" [value]="c.countryCode">{{c.name}} · {{c.currencyCode}}</mat-option></mat-select></mat-form-field>
-  <mat-form-field appearance="outline"><mat-label>Status</mat-label><mat-select [(ngModel)]="model.status" data-testid="template-status"><mat-option value="DRAFT">Draft</mat-option><mat-option value="ACTIVE">Active</mat-option><mat-option value="ARCHIVED">Archived</mat-option></mat-select></mat-form-field>
+  <app-text-field label="Template name" [(ngModel)]="model.name" [maxLength]="100" testId="template-name" (ngModelChange)="dirty=true"></app-text-field>
+  <app-dropdown label="Country and currency" [(ngModel)]="model.countryCode" testId="template-country" [options]="data.countries | dropdownOptions:'countryCode':'name':'currencyCode'" (ngModelChange)="dirty=true"></app-dropdown>
+  <app-dropdown label="Status" [(ngModel)]="model.status" testId="template-status" [options]="[{value:'DRAFT',label:'Draft'},{value:'ACTIVE',label:'Active'},{value:'ARCHIVED',label:'Archived'}]" (ngModelChange)="dirty=true"></app-dropdown>
  </div>
  <div class="section-toolbar"><div><h3>Salary components</h3><p>Fixed values are annual. Keep one basic and one balancing allowance.</p></div><button mat-stroked-button [disabled]="model.components!.length>=20" (click)="add()" data-testid="add-template-component">Add component</button></div>
  <div class="component-list"><div class="component-editor" *ngFor="let row of model.components;let i=index" (change)="dirty=true">
-  <mat-form-field appearance="outline"><mat-label>Component name</mat-label><input matInput [(ngModel)]="row.name" [attr.data-testid]="'component-name-'+i"></mat-form-field>
-  <mat-form-field appearance="outline"><mat-label>Category</mat-label><mat-select [(ngModel)]="row.category"><mat-option *ngFor="let category of categories" [value]="category">{{label(category)}}</mat-option></mat-select></mat-form-field>
-  <mat-form-field appearance="outline"><mat-label>Calculation</mat-label><mat-select [(ngModel)]="row.calculation" (selectionChange)="calculationChanged(row)"><mat-option *ngFor="let calculation of calculations" [value]="calculation">{{label(calculation)}}</mat-option></mat-select></mat-form-field>
-  <mat-form-field appearance="outline"><mat-label>Value</mat-label><input matInput type="number" min="0" step="0.01" [(ngModel)]="row.value" [disabled]="row.calculation==='BALANCE'" [attr.data-testid]="'component-value-'+i"></mat-form-field>
+  <app-text-field label="Component name" [(ngModel)]="row.name" [testId]="'component-name-'+i" (ngModelChange)="dirty=true"></app-text-field>
+  <app-dropdown label="Category" [(ngModel)]="row.category" [options]="categoryOptions" [testId]="'component-category-'+i" (ngModelChange)="dirty=true"></app-dropdown>
+  <app-dropdown label="Calculation" [(ngModel)]="row.calculation" (ngModelChange)="calculationChanged(row)" [options]="calculationOptions" [testId]="'component-calculation-'+i"></app-dropdown>
+  <app-text-field label="Value" type="number" [min]="0" step="0.01" [(ngModel)]="row.value" [disabled]="row.calculation==='BALANCE'" [testId]="'component-value-'+i" (ngModelChange)="dirty=true"></app-text-field>
   <button mat-button type="button" (click)="remove(i)" [attr.aria-label]="'Remove '+row.name">Remove</button>
  </div></div>
  <p class="muted">Template edits apply to future assignments. Existing employee history stays unchanged.</p>

@@ -200,7 +200,7 @@ Columns: employee number, first name, last name, work email, hire date, country 
 
 ## UI screens and navigation
 
-Template filters use simple white rounded input/select controls with labels above the border. Search, status, and the Search button are all 48px high and share the same bottom edge. Their desktop grid stacks at 760px. Use the shared `.form-control` styling for this field variant; preserve native keyboard interaction and accessible label associations.
+All feature screens and dialogs use `TextFieldComponent` and `DropdownComponent` from `shared/form-controls`. They share a plain white rounded 48px shell with separate labels, focus feedback, disabled states, and accessible error messages. `FieldControl` implements Angular Forms value/touched/disabled behavior for both components; `DropdownOptionsPipe` maps reference options once. The dropdown uses Material Select for keyboard navigation, type-ahead selection, overlay positioning, and focus handling. Its styled option list is also reused by table pagination. Template search, status, and Search share one aligned desktop row and stack at 760px.
 
 ```mermaid
 flowchart TD

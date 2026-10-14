@@ -30,4 +30,6 @@ Record confirmed choices here so the repo preserves decisions made in chat. The 
 
 ## Implementation record
 
+2026-10-15: All feature text fields and dropdowns now use shared Angular form components. `FieldControl` centralizes form state and validation; `TextFieldComponent` keeps the accepted 48px field style; `DropdownComponent` wraps Material Select with a consistent option panel. Reference lists use one pure mapping pipe. Pagination uses the same option-panel styling. Verification: production build, 17 frontend unit tests, and 14 Playwright functional tests pass; the mobile employee dialog has matching 48px controls and no horizontal overflow.
+
 For each feature commit, add a row or note with its tests and any trade-off. Record prompts, AI errors, and corrections in `/ai`. Never record credentials or real employee data.

@@ -1,12 +1,12 @@
+import { TextFieldComponent } from '../../shared/form-controls/text-field.component';
+import { DropdownComponent } from '../../shared/form-controls/dropdown.component';
+import { DropdownOptionsPipe } from '../../shared/form-controls/dropdown-options.pipe';
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
 import { finalize, firstValueFrom } from 'rxjs';
 import { DialogShellComponent } from '../../shared/dialog-shell.component';
 import { ConfirmDialogService } from '../../shared/confirm-dialog.service';
@@ -22,7 +22,7 @@ export interface EmployeeFormDialogData {
 @Component({
   selector: 'app-employee-form-dialog',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatButtonModule, MatFormFieldModule, MatInputModule, MatSelectModule, DialogShellComponent],
+  imports: [TextFieldComponent, DropdownComponent, DropdownOptionsPipe, CommonModule, ReactiveFormsModule, MatButtonModule, DialogShellComponent],
   templateUrl: './employee-form-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: [`

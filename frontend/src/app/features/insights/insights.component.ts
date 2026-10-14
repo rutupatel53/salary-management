@@ -1,12 +1,12 @@
+import { TextFieldComponent } from '../../shared/form-controls/text-field.component';
+import { DropdownComponent } from '../../shared/form-controls/dropdown.component';
+import { DropdownOptionsPipe } from '../../shared/form-controls/dropdown-options.pipe';
 import { StatusBadgeComponent } from '../../shared/status-badge.component';
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component,OnInit,inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { finalize } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
-import { MatInputModule } from '@angular/material/input';
 import { EmployeeApiService } from '../employees/employee-api.service';
 import { ReferenceCountry,ReferenceDepartment } from '../employees/employee.models';
 import { InsightsApiService } from './insights-api.service';
@@ -17,7 +17,7 @@ import { LoadingStateComponent } from '../../shared/loading-state.component';
 import { ErrorStateComponent } from '../../shared/error-state.component';
 import { PageGuideComponent } from '../../shared/page-guide.component';
 
-@Component({selector:'app-insights',standalone:true,imports:[StatusBadgeComponent,CommonModule,FormsModule,MatButtonModule,MatFormFieldModule,MatSelectModule,MatInputModule,EmptyStateComponent,FilterBarComponent,LoadingStateComponent,ErrorStateComponent,PageGuideComponent],templateUrl:'./insights.component.html',styleUrl:'./insights.component.css',changeDetection:ChangeDetectionStrategy.OnPush})
+@Component({selector:'app-insights',standalone:true,imports:[TextFieldComponent, DropdownComponent, DropdownOptionsPipe, StatusBadgeComponent,CommonModule,FormsModule,MatButtonModule,EmptyStateComponent,FilterBarComponent,LoadingStateComponent,ErrorStateComponent,PageGuideComponent],templateUrl:'./insights.component.html',styleUrl:'./insights.component.css',changeDetection:ChangeDetectionStrategy.OnPush})
 export class InsightsComponent implements OnInit{
  private readonly api=inject(InsightsApiService);private readonly references=inject(EmployeeApiService);private readonly cdr=inject(ChangeDetectorRef);
  readonly dimensions: {id:InsightDimension;label:string}[]=[{id:'country',label:'Country'},{id:'department',label:'Department'},{id:'jobTitle',label:'Job title'}];

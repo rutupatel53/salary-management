@@ -1,3 +1,6 @@
+import { TextFieldComponent } from '../../shared/form-controls/text-field.component';
+import { DropdownComponent } from '../../shared/form-controls/dropdown.component';
+import { DropdownOptionsPipe } from '../../shared/form-controls/dropdown-options.pipe';
 import { StatusBadgeComponent } from '../../shared/status-badge.component';
 import { downloadFile } from '../../shared/download-file';
 import { CommonModule } from '@angular/common';
@@ -8,9 +11,6 @@ import { EmployeeFormDialogComponent } from './employee-form-dialog.component';
 import { FormsModule } from '@angular/forms';
 import { finalize } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
 import { MatSortModule, Sort } from '@angular/material/sort';
 import { PageEvent } from '@angular/material/paginator';
@@ -28,7 +28,7 @@ import { PageGuideComponent } from '../../shared/page-guide.component';
 
 @Component({
  selector: 'app-employees', standalone: true,
- imports: [StatusBadgeComponent, CommonModule, RouterLink, FormsModule, MatButtonModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatTableModule, MatSortModule, EmptyStateComponent, FilterBarComponent, ServerPagedTableComponent, LoadingStateComponent, ErrorStateComponent, PageGuideComponent],
+ imports: [TextFieldComponent, DropdownComponent, DropdownOptionsPipe, StatusBadgeComponent, CommonModule, RouterLink, FormsModule, MatButtonModule, MatTableModule, MatSortModule, EmptyStateComponent, FilterBarComponent, ServerPagedTableComponent, LoadingStateComponent, ErrorStateComponent, PageGuideComponent],
  templateUrl: './employees.component.html', styleUrl: './employees.component.css', changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EmployeesComponent implements OnInit {
