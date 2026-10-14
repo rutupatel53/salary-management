@@ -18,6 +18,15 @@ An HR salary-management web app for 10,000 fictional employees across five count
 4. Currency-separated pay insights and role outliers
 5. Read-only activity log
 
+## Key decisions and trade-offs
+
+- Use reusable, country-specific salary templates and assign them to employees with annual CTC. This avoids entering the same component rules for every person.
+- Save each salary change as an effective-dated snapshot. Template edits do not rewrite an employee's past salary.
+- Keep salary insights separate by currency. The app does not convert values or imply cross-country comparisons are equivalent.
+- Make spreadsheet imports stateless and atomic. HR previews errors first; confirmation revalidates the file and creates all rows or none.
+- Keep payroll runs, taxes, payslips, approvals, and role-based login out of scope. The product focuses on managing salary structures and answering HR pay questions.
+- Use fictional seed data and a demo actor. This keeps the public assessment deployment safe without adding an authentication system.
+
 ## Start here
 
 1. Read [`docs/requirements.md`](docs/requirements.md).
