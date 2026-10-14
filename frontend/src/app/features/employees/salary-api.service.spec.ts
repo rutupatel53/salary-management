@@ -6,7 +6,7 @@ import { SalaryApiService } from './salary-api.service';
 describe('SalaryApiService',()=>{
  let api:SalaryApiService;let http:HttpTestingController;
  beforeEach(()=>{TestBed.configureTestingModule({providers:[provideHttpClient(),provideHttpClientTesting()]});api=TestBed.inject(SalaryApiService);http=TestBed.inject(HttpTestingController);});
- afterEach(()=>http.verify());
+ afterEach(()=>{http.verify();TestBed.resetTestingModule();});
  it('posts each salary version as an append request',()=>{
   const body={basic:'1000.12',allowances:'100.00',deductions:'25.00',currencyCode:'INR',effectiveDate:'2025-02-01'};
   api.append('employee-1',body).subscribe();

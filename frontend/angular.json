@@ -16,7 +16,7 @@
           "defaultConfiguration": "production"
         },
         "serve": { "builder": "@angular/build:dev-server", "configurations": { "production": { "buildTarget": "salary-management:build:production" }, "development": { "buildTarget": "salary-management:build:development" } }, "defaultConfiguration": "development" },
-        "test": { "builder": "@angular/build:unit-test", "options": { "tsConfig": "tsconfig.spec.json", "runner": "vitest", "include": ["**/*.spec.ts"] } }
+        "test": { "builder": "@angular/build:unit-test", "options": { "tsConfig": "tsconfig.spec.json", "runner": "vitest", "include": ["src/**/*.spec.ts"] } }
       }
     }
   }

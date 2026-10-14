@@ -90,6 +90,11 @@ public class GlobalExceptionHandler {
                 "Workbook exceeds the upload size limit.", Map.of(), null);
     }
 
+    @ExceptionHandler(org.springframework.orm.ObjectOptimisticLockingFailureException.class)
+    public ResponseEntity<ApiResponse<Void>> staleEdit() {
+        return failure(HttpStatus.CONFLICT, "Record changed. Reload it before saving.", Map.of(), null);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> unexpected(Exception exception) {
         LOGGER.error("Unhandled API error", exception);

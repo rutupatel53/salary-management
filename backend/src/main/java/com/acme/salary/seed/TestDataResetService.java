@@ -16,6 +16,8 @@ public class TestDataResetService{
   jdbc.update("DELETE FROM activity_log WHERE employee_id IN (SELECT employee_id FROM employees WHERE employee_number LIKE 'PW-%')");
   jdbc.update("DELETE FROM salary_versions WHERE employee_id IN (SELECT employee_id FROM employees WHERE employee_number LIKE 'PW-%')");
   jdbc.update("DELETE FROM employees WHERE employee_number LIKE 'PW-%'");
+  jdbc.update("DELETE FROM salary_templates WHERE name LIKE 'PW-%'");
+  jdbc.update("DELETE FROM activity_log WHERE action IN ('TEMPLATE_CREATED','TEMPLATE_UPDATED') AND details->>'name' LIKE 'PW-%'");
   String[] titles={"Assessment Test Engineer","Assessment Test Engineer","Assessment Test Engineer","Assessment Test Engineer","Assessment Test Engineer","Assessment Test Engineer"};
   BigDecimal[] basics={new BigDecimal("5000.00"),new BigDecimal("5200.00"),new BigDecimal("5400.00"),new BigDecimal("5600.00"),new BigDecimal("5800.00"),new BigDecimal("25000.00")};
   List<Row> rows=new ArrayList<>();

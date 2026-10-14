@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { EMPTY, Subject } from 'rxjs';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { EmployeeFormDialogComponent } from './employee-form-dialog.component';
 import { EmployeeApiService } from './employee-api.service';
 import { ConfirmDialogService } from '../../shared/confirm-dialog.service';
@@ -9,7 +9,7 @@ import { ConfirmDialogService } from '../../shared/confirm-dialog.service';
 describe('EmployeeFormDialogComponent', () => {
   const api = { create: vi.fn(), update: vi.fn() };
   const dialog = { close: vi.fn(), backdropClick: () => EMPTY, keydownEvents: () => EMPTY };
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
     TestBed.configureTestingModule({
       providers: [
@@ -19,7 +19,10 @@ describe('EmployeeFormDialogComponent', () => {
         { provide: ConfirmDialogService, useValue: { confirm: vi.fn() } }
       ]
     });
+    TestBed.overrideComponent(EmployeeFormDialogComponent, { set: { template: '', styles: [] } });
+    await TestBed.compileComponents();
   });
+  afterEach(() => TestBed.resetTestingModule());
 
   it('does not send an invalid form', () => {
     const component = TestBed.createComponent(EmployeeFormDialogComponent).componentInstance;

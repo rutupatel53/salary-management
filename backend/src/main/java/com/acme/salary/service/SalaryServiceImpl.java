@@ -54,7 +54,8 @@ public class SalaryServiceImpl implements SalaryService {
 
     @Override
     public SalaryVersionResponse append(UUID employeeId, SalaryChangeRequest request) {
-        Employee employee = requireActiveEmployee(employeeId);
+        Employee employee = employeeRepository.findActiveForSalaryUpdate(employeeId)
+                .orElseThrow(() -> new NotFoundException("Employee not found."));
         String currency = employee.getCountry().getCurrencyCode();
         if (!currency.equals(request.currencyCode())) {
             throw new ConflictException("Salary currency must match the employee's country.");

@@ -23,11 +23,11 @@ class SalaryServiceImplTest{
  private EmployeeRepository employees;private SalaryVersionRepository salaries;private SalaryVersionMapper mapper;private AuditService audit;private EntityManager entityManager;private SalaryServiceImpl service;private UUID employeeId;
  @BeforeEach void setup(){
   employees=mock(EmployeeRepository.class);salaries=mock(SalaryVersionRepository.class);mapper=mock(SalaryVersionMapper.class);audit=mock(AuditService.class);entityManager=mock(EntityManager.class);service=new SalaryServiceImpl(employees,salaries,mapper,audit,entityManager);employeeId=UUID.randomUUID();
-  Employee employee=mock(Employee.class);Country country=mock(Country.class);when(employee.getCountry()).thenReturn(country);when(country.getCurrencyCode()).thenReturn("INR");when(employees.findByIdAndArchivedAtIsNull(employeeId)).thenReturn(Optional.of(employee));when(salaries.findTopByEmployeeIdOrderByEffectiveDateDesc(employeeId)).thenReturn(Optional.empty());
+  Employee employee=mock(Employee.class);Country country=mock(Country.class);when(employee.getCountry()).thenReturn(country);when(country.getCurrencyCode()).thenReturn("INR");when(employees.findByIdAndArchivedAtIsNull(employeeId)).thenReturn(Optional.of(employee));when(employees.findActiveForSalaryUpdate(employeeId)).thenReturn(Optional.of(employee));when(salaries.findTopByEmployeeIdOrderByEffectiveDateDesc(employeeId)).thenReturn(Optional.empty());
  }
  private SalaryChangeRequest request(String basic,String allowances,String deductions,String effective){return new SalaryChangeRequest(new BigDecimal(basic),new BigDecimal(allowances),new BigDecimal(deductions),"INR",LocalDate.parse(effective));}
  @Test void appendsRoundedSnapshotAndAuditsChange(){
-  when(salaries.saveAndFlush(any())).thenAnswer(i->i.getArgument(0));when(mapper.toResponse(any())).thenReturn(new SalaryVersionResponse(UUID.randomUUID(),LocalDate.parse("2025-01-01"),"INR",new BigDecimal("1000.13"),new BigDecimal("100.00"),new BigDecimal("50.00"),new BigDecimal("1100.13"),new BigDecimal("1050.13")));
+  when(salaries.saveAndFlush(any())).thenAnswer(i->i.getArgument(0));when(mapper.toResponse(any())).thenReturn(new SalaryVersionResponse(UUID.randomUUID(),LocalDate.parse("2025-01-01"),"INR",new BigDecimal("1000.13"),new BigDecimal("100.00"),new BigDecimal("50.00"),new BigDecimal("1100.13"),new BigDecimal("1050.13"),null,null,null,null));
   var result=service.append(employeeId,request("1000.125","100","50","2025-01-01"));assertEquals(new BigDecimal("1050.13"),result.net());
   verify(salaries).saveAndFlush(argThat(s->s.getBasic().equals(new BigDecimal("1000.13"))));verify(entityManager).refresh(any(SalaryVersion.class));verify(audit).record(eq("SALARY_CHANGED"),eq(employeeId),anyMap());
  }

@@ -7,7 +7,7 @@ import { EmployeeApiService } from './employee-api.service';
 describe('EmployeeApiService', () => {
  let api:EmployeeApiService;let http:HttpTestingController;
  beforeEach(()=>{TestBed.configureTestingModule({providers:[provideHttpClient(),provideHttpClientTesting()]});api=TestBed.inject(EmployeeApiService);http=TestBed.inject(HttpTestingController);});
- afterEach(()=>http.verify());
+ afterEach(()=>{http.verify();TestBed.resetTestingModule();});
  it('sends filters and bounded page fields to the server',()=>{
   api.list({q:'ria',country:'IN',department:'dept-1',page:2,size:25}).subscribe();
   const req=http.expectOne(r=>r.url==='/api/employees');

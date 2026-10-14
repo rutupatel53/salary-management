@@ -1,1 +1,1 @@
-globalThis.salaryApiBase = globalThis.salaryApiBase || '/api';
+globalThis.salaryApiBase = "/api";

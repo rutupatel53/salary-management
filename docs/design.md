@@ -4,7 +4,7 @@
 
 Build a small, public, synthetic-data app that helps an HR manager maintain employee salary records and answer pay questions for a 10,000-person, multi-country organization. Use a Java 17 Spring Boot modular monolith, PostgreSQL, Flyway, and a standalone Angular app with Angular Material and strict TypeScript. Run PostgreSQL locally with Docker Compose. Host the API and database on Render and the static UI on Netlify.
 
-The four modules are people/departments, salary structures/history, Excel import/export, and pay insights. There is no payroll run, tax, payslip, approval workflow, or role-based login. All API boundaries use DTOs. Salary calculations use `BigDecimal` and PostgreSQL `NUMERIC(14,2)`. PostgreSQL performs filtering, pagination, and aggregates.
+The four modules are people/departments, salary templates and assignments/history, Excel import/export, and pay insights. There is also a read-only activity feed. There is no payroll run, tax, payslip, approval workflow, or role-based login. All API boundaries use DTOs. Salary calculations use `BigDecimal` and PostgreSQL `NUMERIC(14,2)`. PostgreSQL performs filtering, pagination, and aggregates.
 
 ## System architecture
 
@@ -68,14 +68,16 @@ e2e/
 
 ## Database schema
 
-Use five tables. Country and department rows are reference data. Salary versions store the three fixed amounts directly, plus PostgreSQL stored generated columns for gross and net, so a component table is not needed. Imports have no stored batch or row tables: preview and confirm are stateless requests. The activity log is required by scope.
+Use six tables. Country and department rows are reference data. Salary templates store a bounded, validated component definition as JSONB. Salary versions preserve resolved annual and monthly component breakdowns as JSONB so template edits never change history; their fixed totals remain typed numeric columns with generated gross and net. Imports have no stored batch or row tables: preview and confirm are stateless requests. The activity log is required by scope.
 
 ```mermaid
 erDiagram
     COUNTRIES ||--o{ EMPLOYEES : employs
     DEPARTMENTS ||--o{ EMPLOYEES : groups
     EMPLOYEES ||--o{ SALARY_VERSIONS : has_history
+    SALARY_TEMPLATES o|--o{ SALARY_VERSIONS : source_template
     EMPLOYEES o|--o{ ACTIVITY_LOG : target_of
+    COUNTRIES ||--o{ SALARY_TEMPLATES : applies_in
 
     COUNTRIES {
         varchar2 country_code PK
@@ -111,7 +113,21 @@ erDiagram
         numeric deductions_amount
         numeric gross GENERATED_STORED
         numeric net GENERATED_STORED
+        uuid template_id FK_nullable
+        varchar template_name_snapshot
+        bigint template_revision_snapshot
+        numeric annual_ctc
+        jsonb assignment_breakdown_snapshot
         timestamptz created_at
+    }
+    SALARY_TEMPLATES {
+        uuid template_id PK
+        varchar name
+        varchar2 country_code FK
+        varchar3 currency_code
+        varchar status
+        bigint revision optimistic_lock
+        jsonb components bounded_1_to_20
     }
     ACTIVITY_LOG {
         bigint activity_id PK
@@ -133,6 +149,8 @@ erDiagram
 | `employees` | Index `(archived_at, employee_number)`; indexes on `country_code`, `department_id`; add job-title/search indexes only after the seeded query check | Support default active listing, filters, and stable paging without speculative index sprawl. |
 | `salary_versions` | Unique `(employee_id, effective_date)`; FK to employee; nonnegative `NUMERIC(14,2)` inputs; stored generated `gross = basic_amount + allowances_amount`; stored generated `net = basic_amount + allowances_amount - deductions_amount`; `CHECK (net >= 0)` | Preserve one salary snapshot per effective date, calculate values once in PostgreSQL, and enforce no negative net at storage level. |
 | `salary_versions` | Index `(employee_id, effective_date DESC)` | Load current and historical salary versions efficiently. |
+| `salary_templates` | Unique `(country_code, lower(name))`; index `(country_code, status, name)`; JSONB array length 1–20 | Prevent duplicate local template names, support country/status selection, and keep component definitions bounded without another table. |
+| `salary_versions` | Nullable template FK with `ON DELETE RESTRICT`; template name/revision snapshots, positive annual CTC, resolved breakdown JSONB | Preserve assignment provenance and the exact calculated component amounts if a template is later revised or archived. Templates are archived, never deleted. |
 | `activity_log` | PK; required actor/action/time; optional employee FK using `ON DELETE SET NULL`; action `CHECK`; no update/delete API | Preserve history if a target is unavailable; keep the activity view read-only. |
 | `activity_log` | Index `(occurred_at DESC, activity_id DESC)` and `(employee_id, occurred_at DESC)` | Support the newest-first activity screen and employee-specific history. |
 
@@ -142,7 +160,7 @@ PostgreSQL generated expressions cannot reference another generated column. Ther
 
 ### Tables deliberately omitted
 
-- **Salary component table:** unnecessary while basic, allowances, and deductions are the only supported totals. Three typed `NUMERIC` columns are simpler and make gross/net constraints direct. Revisit only if arbitrary named components become a confirmed need.
+- **Salary component table:** unnecessary for the bounded first version. Each template stores at most 20 validated components in JSONB and each assignment snapshots the resolved values; typed base totals keep the database gross/net rules direct. A normalized child table can wait until components need independent reporting or lifecycle.
 - **Import batch and import row tables:** unnecessary and contrary to the stateless import requirement. Preview returns a response without writes; confirm uploads the workbook again and validates it again in one transaction.
 - **Currency table:** unnecessary for five fixed country/currency mappings. Country rows carry the local currency. Salary versions also store their currency so past salary history is explicit if an employee changes country.
 - **Job title table:** unnecessary for the current scope. Keep a validated, bounded employee field and group it in SQL. Add controlled job-title administration only if HR requires it.
@@ -163,6 +181,11 @@ All endpoints are under `/api`. Paginated endpoints cap `size` at 100 and return
 | `DELETE /employees/{id}` | Archive employee (soft delete) | Set `archived_at`; repeated archive is safe; preserve salary history and audit trail. |
 | `GET /employees/{id}/salary-history` | Read salary versions newest-first | 404 for unknown employee; currency and effective date included. |
 | `POST /employees/{id}/salary-history` | Append salary version | Require effective date after latest version, nonnegative amounts, supported currency, and deductions no greater than gross; PostgreSQL generates and stores gross/net. |
+| `GET /salary-templates` | Search and page templates | Bounded page size; optional country/status/search; stable name ordering. |
+| `POST /salary-templates` | Create a salary template | Supported country, matching configured currency, unique country/name, 1–20 valid components, exactly one basic and one balancing allowance. |
+| `PUT /salary-templates/{id}` | Revise template definition or status | Require current revision; conflict on stale edit; edits never mutate salary history. |
+| `POST /salary-assignments/preview` | Calculate annual and monthly CTC breakdown | Active template, same employee country, current template revision, positive two-decimal annual CTC, date on/after hire and after latest salary. No write. |
+| `POST /salary-assignments` | Assign template and append salary snapshot | Revalidate and lock employee/template; reject stale revision, archived employee, invalid date, negative balancing remainder, or negative net; write salary and audit atomically. |
 | `GET /insights/pay` | Aggregate average, median, min, max, and range by selected dimension | `groupBy` allowlist: country, department, job title; include currency in every group; ignore archived or missing salary. |
 | `GET /insights/outliers` | List gross-pay outliers within job-title/country/currency groups | Use this grouping everywhere; IQR rule; require at least five salaries in each group; omit undersized groups. |
 | `GET /imports/template` | Download `.xlsx` template | Include documented columns and example-free headers. |
@@ -189,6 +212,13 @@ flowchart TD
     LIST --> FORM[Add employee]
     DETAIL --> EDIT[Edit employee]
     DETAIL --> SAL[Salary and history]
+    APP --> TEMPLATES[Salary templates]
+    APP --> ASSIGN[Salary assignments]
+    TEMPLATES --> EDIT_TEMPLATE[Build, copy, preview, activate]
+    ASSIGN --> PICK[Search employee and compatible template]
+    PICK --> REVIEW[Annual CTC and effective date]
+    REVIEW --> CONFIRM[Review monthly and annual breakdown]
+    CONFIRM --> SAL
     INS --> FILTERS[Country, department, job title]
     INS --> SUMMARY[Average, median, min, max, range]
     INS --> OUT[Role outliers]
@@ -199,7 +229,9 @@ flowchart TD
 ```
 
 - **Employees:** table with search, filters, pagination, create action, and archive action. Empty, loading, error, and no-match states are visible.
-- **Employee detail:** employee identity, hire date, country, department, and job title; edit action; salary tab with current snapshot and append-only history.
+- **Employee detail:** employee identity, hire date, country, department, and job title; edit action; salary tab with current snapshot and append-only history. A direct salary action opens assignment with that employee preselected.
+- **Salary templates:** searchable country/status list, clear status badges, create/copy/edit/preview actions, and a compact component editor. Drafts can be saved; only valid templates can be activated; archived templates remain visible but cannot be assigned.
+- **Salary assignments:** one workflow to search by employee identity, choose an active country-compatible template, enter annual CTC/effective date, preview monthly/yearly results, confirm, and see the prior salary context. HR does not need to open employee records one by one.
 - **Pay insights:** dimension/filter controls, currency-labeled summary table, and role outlier list. Tables are the accessible source for any chart.
 - **Import/export:** template link, workbook upload, row-level preview with field errors, atomic confirm state, and filtered export controls.
 - **Activity:** read-only newest-first event list with actor, action, target, time, and safe summary details. Link to employee detail when the employee still exists.
@@ -214,12 +246,13 @@ flowchart TD
 4. HR edits employee fields; `PUT /api/employees/{id}` validates and updates in a transaction.
 5. The service adds `EMPLOYEE_UPDATED` to `activity_log`; the UI returns to the refreshed detail page.
 
-### Change a salary
+### Create and assign a salary template
 
-1. HR opens the employee's Salary tab and sees the current version/history.
-2. HR enters effective date, currency, basic, allowances, and deductions.
-3. `POST /api/employees/{id}/salary-history` validates the date and amounts, calculates gross/net, appends a `salary_versions` row, and appends `SALARY_CHANGED` activity in one transaction.
-4. The detail screen shows the new current version and the previous version unchanged.
+1. HR opens Salary templates, chooses a country and creates a short named template with basic, allowances, employer contributions, deductions, and one balancing allowance. Each component uses a fixed annual amount or a supported percentage rule.
+2. HR previews and activates the valid template. `POST /api/salary-templates` or `PUT /api/salary-templates/{id}` saves its bounded definition and audit event.
+3. HR opens Salary assignments (or uses the direct employee action), searches by name, email, or employee number, and selects an active template for that employee's country.
+4. HR enters annual CTC and effective date. `POST /api/salary-templates/assignments/preview` calculates annual and monthly figures; employer contributions are part of CTC, gross is basic plus allowances, and net is gross less employee deductions.
+5. HR reviews the current salary context and confirms. The API revalidates the template revision and date, locks the employee row, appends the immutable salary snapshot and audit event in one transaction, then shows the updated history.
 
 ### Answer a pay question
 
@@ -252,7 +285,8 @@ There is no login, so the app cannot prove a human identity. For the synthetic p
 ## Key trade-offs
 
 - **Modular monolith:** keep people, salary, imports, insights, and activity as backend packages in one deployable service. At 10,000 employees this keeps setup and transactions simple; microservices, queues, and caches add work without a measured need.
-- **One salary row per effective date:** three numeric columns make the fixed component model, constraints, and history clear. A flexible component table is deferred until arbitrary components are required.
+- **Bounded template JSON:** one JSONB array capped at 20 validated components avoids a component table for the assessment. Each salary version stores the resolved annual/monthly values, so template revisions cannot rewrite history. Normalize components only if independent component reporting becomes necessary.
+- **One salary row per effective date:** salary versions keep typed basic, allowance, and deduction totals for direct generated-column constraints, alongside immutable template provenance and breakdown snapshots.
 - **Stateless import:** no batch tables or persisted preview. The client must re-upload at confirm; the API validates again and inserts atomically. This avoids temporary data lifecycle and cleanup jobs.
 - **Separate currencies:** each country has a configured local currency; each salary version stores its currency. Insights always group by currency and never invent exchange rates.
 - **Soft delete:** archive employees rather than deleting salary history or audit events.
@@ -295,4 +329,27 @@ Employee list and export accept `sortBy` and `direction`. Defaults are employeeN
 
 Use a light sidebar, blue primary actions, neutral surfaces, shared SVG icons, and text-bearing status badges. Navigation highlights the active route. At 960px and below it becomes an overlay drawer with Escape and route-change closing. Main headings, cards, filters, and tables use shared theme tokens. Filters become full-width on phones. Wide tables scroll inside their own containers and leave pagination reachable.
 
-The user supplied screenshots clarifying a separate salary-template builder followed by employee CTC assignment and calculation preview. Annual/monthly CTC, component rules, employer-contribution treatment, and template version semantics are pending clarification before the schema changes. This is an open delivery gate.
+The user supplied screenshots clarifying a separate salary-template builder followed by employee CTC assignment and calculation preview. CTC and template rules are confirmed in the following workflow section. Implementation and verification remain delivery gates.
+
+
+## Confirmed template and assignment workflow
+
+The user accepted annual CTC, fixed amounts, percentages of CTC/basic, one balancing allowance, and employer contributions distinct from gross. Keep the workflow short. HR must be able to assign salary directly without navigating through employee edit screens.
+
+- Salary templates: searchable list with Draft/Active/Archived badges; create/edit component rows; copy and preview. A template belongs to one country and uses its currency. Component categories are BASIC, ALLOWANCE, EMPLOYER_CONTRIBUTION, and DEDUCTION. One basic component and exactly one balancing allowance are required for activation. No tax or payroll engine.
+- Salary assignments: search employees directly by name/email/number, select an employee, choose a compatible active template, enter annual CTC and effective date, review monthly/yearly totals, then confirm. Show the previous salary/effective date and clear validation errors. The employee directory offers a direct salary action.
+- Store templates in one salary_templates table with validated component JSON and optimistic revision. Store the template identity/revision and resolved component JSON on the immutable salary version. Template edits cannot change assigned salaries.
+- All fixed component inputs are annual. Percentage rates have up to two decimals. Calculate basic first, then other fixed/percentage components, then assign the CTC remainder to the balancing allowance. Reject negative remainder and negative net. Calculate monthly with two-decimal HALF_UP amounts and a monthly balancing remainder. Annual and monthly amounts may differ by rounding when multiplied by twelve; label the two views.
+- Preview and confirm use the same server calculator. Confirm revalidates the employee, active template, submitted revision, country/currency and effective date in a transaction. Lock the employee row when saving to serialize salary changes.
+- Template list and employee search remain server paginated. Template rows are bounded (maximum 20 components). Status changes and assignments are audited.
+
+```mermaid
+flowchart LR
+  T[Create salary template] --> A[Activate template]
+  E[Search employee in Salary assignments] --> C[Choose compatible template]
+  A --> C
+  C --> I[Annual CTC and effective date]
+  I --> P[Review monthly and annual breakdown]
+  P --> S[Confirm immutable salary snapshot]
+  S --> H[History and pay insights]
+```

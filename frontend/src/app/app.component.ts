@@ -22,6 +22,8 @@ export class AppComponent {
  readonly pageName = signal('Employees');
  readonly links = [
    { path: '/employees', label: 'Employees', icon: 'people', testId: 'nav-employees' },
+   { path: '/salary-assignments', label: 'Salary assignments', icon: 'file', testId: 'nav-salary-assignments' },
+   { path: '/salary-templates', label: 'Salary templates', icon: 'grid', testId: 'nav-salary-templates' },
    { path: '/insights', label: 'Pay insights', icon: 'insights', testId: 'nav-insights' },
    { path: '/import-export', label: 'Import & export', icon: 'file', testId: 'nav-import-export' },
    { path: '/activity', label: 'Activity log', icon: 'activity', testId: 'nav-activity' }

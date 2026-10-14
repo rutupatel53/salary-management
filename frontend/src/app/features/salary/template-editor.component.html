@@ -1,0 +1,18 @@
+<app-dialog-shell [title]="model.id ? 'Edit salary template' : 'Create salary template'" eyebrow="SALARY SETUP" description="Define the rules once. Each employee gets their own CTC and dated salary snapshot.">
+ <div *ngIf="error" class="error-banner" role="alert">{{error}}</div>
+ <div class="template-details" (change)="dirty=true">
+  <mat-form-field appearance="outline"><mat-label>Template name</mat-label><input matInput [(ngModel)]="model.name" maxlength="100" data-testid="template-name"></mat-form-field>
+  <mat-form-field appearance="outline"><mat-label>Country and currency</mat-label><mat-select [(ngModel)]="model.countryCode" data-testid="template-country"><mat-option *ngFor="let c of data.countries" [value]="c.countryCode">{{c.name}} · {{c.currencyCode}}</mat-option></mat-select></mat-form-field>
+  <mat-form-field appearance="outline"><mat-label>Status</mat-label><mat-select [(ngModel)]="model.status" data-testid="template-status"><mat-option value="DRAFT">Draft</mat-option><mat-option value="ACTIVE">Active</mat-option><mat-option value="ARCHIVED">Archived</mat-option></mat-select></mat-form-field>
+ </div>
+ <div class="section-toolbar"><div><h3>Salary components</h3><p>Fixed values are annual. Keep one basic and one balancing allowance.</p></div><button mat-stroked-button [disabled]="model.components!.length>=20" (click)="add()" data-testid="add-template-component">Add component</button></div>
+ <div class="component-list"><div class="component-editor" *ngFor="let row of model.components;let i=index" (change)="dirty=true">
+  <mat-form-field appearance="outline"><mat-label>Component name</mat-label><input matInput [(ngModel)]="row.name" [attr.data-testid]="'component-name-'+i"></mat-form-field>
+  <mat-form-field appearance="outline"><mat-label>Category</mat-label><mat-select [(ngModel)]="row.category"><mat-option *ngFor="let category of categories" [value]="category">{{label(category)}}</mat-option></mat-select></mat-form-field>
+  <mat-form-field appearance="outline"><mat-label>Calculation</mat-label><mat-select [(ngModel)]="row.calculation" (selectionChange)="calculationChanged(row)"><mat-option *ngFor="let calculation of calculations" [value]="calculation">{{label(calculation)}}</mat-option></mat-select></mat-form-field>
+  <mat-form-field appearance="outline"><mat-label>Value</mat-label><input matInput type="number" min="0" step="0.01" [(ngModel)]="row.value" [disabled]="row.calculation==='BALANCE'" [attr.data-testid]="'component-value-'+i"></mat-form-field>
+  <button mat-button type="button" (click)="remove(i)" [attr.aria-label]="'Remove '+row.name">Remove</button>
+ </div></div>
+ <p class="muted">Template edits apply to future assignments. Existing employee history stays unchanged.</p>
+ <ng-container dialogActions><button mat-button [disabled]="saving" (click)="cancel()">Cancel</button><button mat-flat-button [disabled]="saving" (click)="save()" data-testid="save-template">{{saving?'Saving…':'Save template'}}</button></ng-container>
+</app-dialog-shell>

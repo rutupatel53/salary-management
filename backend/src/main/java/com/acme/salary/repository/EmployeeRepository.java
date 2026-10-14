@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -35,4 +36,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, UUID>, JpaSp
     @Query(value = "SELECT lower(work_email) FROM employees WHERE lower(work_email) IN (:values)",
             nativeQuery = true)
     Set<String> findExistingWorkEmails(Collection<String> values);
+    @org.springframework.data.jpa.repository.Lock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
+    @Query("select e from Employee e where e.id = :id and e.archivedAt is null")
+    Optional<Employee> findActiveForSalaryUpdate(@Param("id") UUID id);
 }
