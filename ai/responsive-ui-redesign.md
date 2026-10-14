@@ -8,6 +8,7 @@ The initial shell used a desktop sidebar and mobile drawer. The user asked for a
 
 - Added a compact top bar with a hamburger and a responsive overlay side menu for all screen sizes.
 - Added compact page-specific usage steps across the employee, salary, insights, import/export, and activity screens. Salary-template edit/copy/assign actions use icons with tooltips and accessible names.
+- Refined Angular Material controls after the user said fields and buttons looked unfinished: shared field height, label/input typography, focus colors, button sizes, hover states, disabled feedback, and mobile filter wrapping. Kept salary-template row actions on one line.
 - Kept blue for the active route and primary actions; kept other surfaces neutral and labels concise.
 - Preserved the dedicated salary-template and direct annual-CTC assignment workspaces.
 - Added generated `runtime-config.js` to Angular's root build assets. Before this fix, nginx served the HTML fallback for that URL and caused `Unexpected token '<'` on direct page loads.

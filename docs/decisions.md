@@ -25,6 +25,7 @@ Record confirmed choices here so the repo preserves decisions made in chat. The 
 | 2026-10-14 | Implement small vertical slices; commit each with its unit and matching Playwright tests. After each phase report done/tests/next in three lines. | Keep progress reviewable and tests close to behavior. |
 | 2026-10-14 | UI direction updated: use a hamburger in the compact top bar to open the left side menu as an overlay on both desktop and mobile. Start closed; close after navigation, Escape, or backdrop click. | The user clarified they want a side menu controlled by a responsive hamburger on web and mobile. |
 | 2026-10-14 | Salary template row actions use icons with tooltips and accessible labels. Each feature screen provides a brief visible usage guide. | Reduce button text clutter while keeping the controls discoverable and the workflows clear. |
+| 2026-10-14 | Standardize Angular Material form fields and buttons with shared dimensions, typography, borders, hover/focus feedback, and mobile wrapping. Keep template row action icons in one horizontal group. | Make controls feel consistent and usable across every feature instead of relying on unrelated local styles. |
 
 ## Implementation record
 

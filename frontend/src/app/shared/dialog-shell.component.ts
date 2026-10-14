@@ -13,13 +13,13 @@ import { MatDialogModule } from '@angular/material/dialog';
   `,
   styles: [`
     :host { display: block; }
-    header { padding: 24px 24px 12px; border-bottom: 1px solid #e5e9f0; }
-    .eyebrow { color: #6256bc; font-size: 11px; font-weight: 700; letter-spacing: .12em; }
-    h2 { padding: 0; margin: 6px 0; font-size: 24px; }
+    header { padding: 24px 24px 12px; border-bottom: 1px solid var(--border,#e5e9f0); }
+    .eyebrow { color: var(--primary,#2368ce); font-size: 11px; font-weight: 700; letter-spacing: .12em; }
+    h2 { padding: 0; margin: 6px 0; font-size: 23px; }
     h2::before { display: none; }
-    p { margin: 0 0 12px; color: #65738b; font-size: 14px; line-height: 1.5; }
+    p { margin: 0 0 12px; color: var(--muted,#65738b); font-size: 13px; line-height: 1.55; }
     mat-dialog-content { padding: 24px; }
-    mat-dialog-actions { padding: 16px 24px; border-top: 1px solid #e5e9f0; gap: 8px; }
+    mat-dialog-actions { padding: 16px 24px; border-top: 1px solid var(--border,#e5e9f0); gap: 8px; }
   `]
 })
 export class DialogShellComponent {
