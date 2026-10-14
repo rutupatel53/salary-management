@@ -15,8 +15,9 @@ import { EmptyStateComponent } from '../../shared/empty-state.component';
 import { FilterBarComponent } from '../../shared/filter-bar.component';
 import { LoadingStateComponent } from '../../shared/loading-state.component';
 import { ErrorStateComponent } from '../../shared/error-state.component';
+import { PageGuideComponent } from '../../shared/page-guide.component';
 
-@Component({selector:'app-insights',standalone:true,imports:[StatusBadgeComponent,CommonModule,FormsModule,MatButtonModule,MatFormFieldModule,MatSelectModule,MatInputModule,EmptyStateComponent,FilterBarComponent,LoadingStateComponent,ErrorStateComponent],templateUrl:'./insights.component.html',styleUrl:'./insights.component.css',changeDetection:ChangeDetectionStrategy.OnPush})
+@Component({selector:'app-insights',standalone:true,imports:[StatusBadgeComponent,CommonModule,FormsModule,MatButtonModule,MatFormFieldModule,MatSelectModule,MatInputModule,EmptyStateComponent,FilterBarComponent,LoadingStateComponent,ErrorStateComponent,PageGuideComponent],templateUrl:'./insights.component.html',styleUrl:'./insights.component.css',changeDetection:ChangeDetectionStrategy.OnPush})
 export class InsightsComponent implements OnInit{
  private readonly api=inject(InsightsApiService);private readonly references=inject(EmployeeApiService);private readonly cdr=inject(ChangeDetectorRef);
  readonly dimensions: {id:InsightDimension;label:string}[]=[{id:'country',label:'Country'},{id:'department',label:'Department'},{id:'jobTitle',label:'Job title'}];

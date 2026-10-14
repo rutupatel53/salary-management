@@ -327,7 +327,7 @@ Employee list and export accept `sortBy` and `direction`. Defaults are employeeN
 
 ## Responsive workspace design
 
-Use a light sidebar, blue primary actions, neutral surfaces, shared SVG icons, and text-bearing status badges. Navigation highlights the active route. At 960px and below it becomes an overlay drawer with Escape and route-change closing. Main headings, cards, filters, and tables use shared theme tokens. Filters become full-width on phones. Wide tables scroll inside their own containers and leave pagination reachable.
+Use a compact top bar with a hamburger that opens a left side menu as an overlay on both desktop and mobile. Keep the menu closed by default and close it after route selection, Escape, or backdrop click. Keep blue for primary actions and the active route, neutral surfaces elsewhere, and use status badges only when they help identify currency or record status. Main headings, cards, filters, and tables use shared theme tokens. Feature screens include short visible page guides. Icon-only actions have tooltips and accessible labels. Filters become full-width on phones. Wide tables scroll inside their own containers and leave pagination reachable.
 
 The user supplied screenshots clarifying a separate salary-template builder followed by employee CTC assignment and calculation preview. CTC and template rules are confirmed in the following workflow section. Implementation and verification remain delivery gates.
 

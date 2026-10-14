@@ -11,10 +11,17 @@ test('@sanity API health endpoint responds', async ({ request }) => {
 });
 
 test('@sanity home page loads and employee list contains seeded rows', async ({ page }) => {
+  const pageErrors: string[] = [];
+  page.on('pageerror', error => pageErrors.push(error.message));
+  const runtimeConfig = page.waitForResponse(response => response.url().endsWith('/runtime-config.js'));
   const employees = new EmployeeListPage(page);
   await employees.open();
+  const configResponse = await runtimeConfig;
+  expect(configResponse.ok()).toBeTruthy();
+  expect(configResponse.headers()['content-type']).toContain('javascript');
   await employees.expectLoaded();
   await expect(employees.rows().first()).toBeVisible();
+  expect(pageErrors).toEqual([]);
 });
 
 test('@sanity insights screen loads without errors',async({page})=>{

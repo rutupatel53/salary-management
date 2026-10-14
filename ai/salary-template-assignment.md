@@ -24,7 +24,7 @@ The user reviewed the first UI and asked for a responsive redesign, less sidebar
 
 ## Verification status
 
-- Angular production build passed after the new screens were added.
+- Angular production build passed in the Node 24 container after adding the new screens and fixing root-level runtime config assets.
 - Backend calculation unit tests were added for template arithmetic and invalid cases.
 - Frontend Vitest now uses a shared Angular test platform and one worker. The unit suite passes after fixing `TestBed` cleanup and resolving the employee dialog component template in its isolated tests.
-- Backend Maven tests are still blocked: required dependencies are not cached, and this environment cannot resolve Maven Central. Docker Desktop also cannot connect to the PostgreSQL engine.
+- Backend JUnit tests passed via the Dockerfile `unit-tests` build target against the current backend source. Required Playwright suites pass 22/22 with PostgreSQL 16.15 and the Angular UI running in Docker.

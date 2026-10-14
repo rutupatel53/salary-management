@@ -14,8 +14,9 @@ import { SalaryVersion } from '../employees/salary.models';
 import { StatusBadgeComponent } from '../../shared/status-badge.component';
 import { ConfirmDialogService } from '../../shared/confirm-dialog.service';
 import { SalaryWorkspaceApiService, SalaryTemplate, AssignmentRequest, AssignmentPreview } from './salary-workspace-api.service';
+import { PageGuideComponent } from '../../shared/page-guide.component';
 
-@Component({selector:'app-salary-assignments',standalone:true,imports:[CommonModule,FormsModule,RouterLink,MatButtonModule,MatFormFieldModule,MatInputModule,MatSelectModule,StatusBadgeComponent],templateUrl:'./salary-assignments.component.html',styleUrl:'./salary-workspace.css',changeDetection:ChangeDetectionStrategy.OnPush})
+@Component({selector:'app-salary-assignments',standalone:true,imports:[CommonModule,FormsModule,RouterLink,MatButtonModule,MatFormFieldModule,MatInputModule,MatSelectModule,StatusBadgeComponent,PageGuideComponent],templateUrl:'./salary-assignments.component.html',styleUrl:'./salary-workspace.css',changeDetection:ChangeDetectionStrategy.OnPush})
 export class SalaryAssignmentsComponent {
  private readonly employees=inject(EmployeeApiService);
  private readonly salary=inject(SalaryApiService);

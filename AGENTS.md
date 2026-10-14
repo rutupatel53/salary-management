@@ -58,6 +58,14 @@ features/   employees, salary, insights, import-export, activity
 
 Components never call `HttpClient` directly. Feature API services use the core API base service. Shared components expose stable `data-testid` attributes. Use standalone components and strict template/type checks.
 
+## UI navigation
+
+- Use a compact header with a hamburger that opens the left side menu as an overlay on desktop and mobile.
+- The side menu starts closed and closes after route selection, Escape, or backdrop click.
+- Feature screens include a short visible “How to use this page” guide with practical steps.
+- Table actions that use icons include a tooltip and an accessible name; icon-only controls must remain keyboard reachable.
+- Keep the theme restrained: neutral surfaces, blue primary actions, and badges only for useful status or currency labels.
+
 ## Data and product rules
 
 - Money is `BigDecimal` in Java and `NUMERIC(14,2)` in PostgreSQL. Never use binary floating point.

@@ -24,10 +24,11 @@ import { ServerPagedTableComponent } from '../../shared/server-paged-table.compo
 import { LoadingStateComponent } from '../../shared/loading-state.component';
 import { ErrorStateComponent } from '../../shared/error-state.component';
 import { firstValueFrom } from 'rxjs';
+import { PageGuideComponent } from '../../shared/page-guide.component';
 
 @Component({
  selector: 'app-employees', standalone: true,
- imports: [StatusBadgeComponent, CommonModule, RouterLink, FormsModule, MatButtonModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatTableModule, MatSortModule, EmptyStateComponent, FilterBarComponent, ServerPagedTableComponent, LoadingStateComponent, ErrorStateComponent],
+ imports: [StatusBadgeComponent, CommonModule, RouterLink, FormsModule, MatButtonModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatTableModule, MatSortModule, EmptyStateComponent, FilterBarComponent, ServerPagedTableComponent, LoadingStateComponent, ErrorStateComponent, PageGuideComponent],
  templateUrl: './employees.component.html', styleUrl: './employees.component.css', changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EmployeesComponent implements OnInit {

@@ -1,4 +1,5 @@
 <section class="page-heading"><div><span class="eyebrow">SPREADSHEET WORKFLOWS</span><h1>Import and export</h1><p>Review every row before importing. Exports follow the selected filters.</p></div><button mat-stroked-button type="button" (click)="downloadTemplate()" data-testid="download-template">Download template</button></section>
+<app-page-guide><p>Imports are checked before they change employee records. Exports include employees matching the filters below.</p><ol><li>Download the template and fill its required columns.</li><li>Upload and preview; fix every reported row error.</li><li>Confirm the import, or filter and export the current view.</li></ol></app-page-guide>
 <p class="notice" role="status" data-testid="import-notice" *ngIf="notice.message()">{{notice.message()}}</p>
 <app-error-state *ngIf="error" [message]="error"></app-error-state>
 <div class="grid">

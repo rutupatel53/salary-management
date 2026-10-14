@@ -9,8 +9,9 @@ import { SalaryApiService } from './salary-api.service';
 import { Employee } from './employee.models';
 import { SalaryVersion } from './salary.models';
 import { ErrorStateComponent } from '../../shared/error-state.component';
+import { PageGuideComponent } from '../../shared/page-guide.component';
 
-@Component({selector:'app-employee-detail',standalone:true,imports:[CommonModule,RouterLink,MatButtonModule,ErrorStateComponent],templateUrl:'./employee-detail.component.html',styleUrl:'./employee-detail.component.css',changeDetection:ChangeDetectionStrategy.OnPush})
+@Component({selector:'app-employee-detail',standalone:true,imports:[CommonModule,RouterLink,MatButtonModule,ErrorStateComponent,PageGuideComponent],templateUrl:'./employee-detail.component.html',styleUrl:'./employee-detail.component.css',changeDetection:ChangeDetectionStrategy.OnPush})
 export class EmployeeDetailComponent implements OnInit{
  private readonly route=inject(ActivatedRoute);private readonly api=inject(EmployeeApiService);private readonly salaryApi=inject(SalaryApiService);
  private readonly cdr=inject(ChangeDetectorRef);

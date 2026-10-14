@@ -2,7 +2,7 @@
 
 Updated: 2026-10-14
 
-Post-template verification for commit `634c958`: Angular production build passes and all 13 frontend unit tests pass. Playwright discovers 22 tests, but the full suite has not been run after the template migration. Backend Maven tests and local database checks are pending: Docker Desktop cannot connect to its engine, and this environment cannot resolve Maven Central. Do not treat this final regression gate as complete until CI or a working local PostgreSQL/Maven setup verifies it.
+Verification on 2026-10-14: PostgreSQL 16.15, the Java 17 API, and Angular UI run locally in an isolated Compose project. All three Flyway migrations pass; the deterministic seed has exactly 10,000 employees. Backend JUnit passed 28 tests. The latest Angular build and 13 unit tests pass, and Playwright functional passes 13/13 plus sanity 3/3 with the responsive hamburger menu, salary-template icons and tooltips, and page guides. Render provisioning and public deployment remain blocked on connecting the Render account/repository.
 
 ## Ready in the repository
 
@@ -13,7 +13,7 @@ Post-template verification for commit `634c958`: Angular production build passes
 - [x] PostgreSQL 16.15 local database passes the 10,000-row data invariants and outlier checks.
 - [x] Backend JUnit/Mockito suite passes: 28 tests, zero failures or errors.
 - [x] Angular production build and unit suite pass: 11 tests, zero failures.
-- [x] Playwright `@sanity`, selected `@functional`, and essential `@data` suites pass: 20 tests, zero failures.
+- [x] Playwright `@sanity`, selected `@functional`, and essential `@data` suites pass: 22 tests, zero failures.
 - [x] PostgreSQL 16 performance plans and timings are recorded in `docs/performance.md` and the test report.
 - [x] GitHub Actions runs tests only and uploads HTML/JUnit reports. Render and Netlify auto-deploy remain outside CI.
 - [x] Render Blueprint, Netlify configuration, setup notes, AI notes, performance notes, and demo script are committed.
@@ -27,8 +27,8 @@ Post-template verification for commit `634c958`: Angular production build passes
 - [x] Replace per-employee salary editing with searchable direct assignment, annual CTC entry, preview, confirmation, and immutable salary history. Keep a direct shortcut from employee list/detail.
 - [ ] Review all screens for consistent navigation, shared controls, loading, empty, and error states.
 - [x] Inspect the redesigned shell and main-screen layouts at phone/tablet/desktop widths (390/768/1440px); no page-level horizontal overflow.
-- [ ] Inspect the salary-template and assignment screens at phone/tablet/desktop widths and confirm no page-level horizontal overflow.
-- [ ] Run the final regression suite against the completed UI.
+- [x] Inspect the salary-template and assignment screens at phone/tablet/desktop widths; no page-level horizontal overflow or browser errors.
+- [x] Run the final required Playwright regression suite against the completed local UI (22/22).
 
 ## Still required before emailing the submission
 

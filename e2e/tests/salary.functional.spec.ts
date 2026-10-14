@@ -11,6 +11,13 @@ test('@functional HR creates a template and assigns salary directly by employee 
   await page.getByTestId('save-template').click();
   await expect(page.getByRole('dialog')).toHaveCount(0);
   await expect(page.getByTestId('template-table')).toContainText('PW-Standard');
+  await expect(page.getByTestId('page-guide')).toContainText('Create a country and currency-specific template once');
+  const editTemplate = page.getByRole('button', { name: 'View or edit PW-Standard' });
+  await expect(editTemplate).toBeVisible();
+  await editTemplate.hover();
+  await expect(page.locator('.mat-mdc-tooltip-surface')).toHaveText('View or edit template');
+  await expect(page.getByRole('button', { name: 'Copy PW-Standard as a new draft' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Assign PW-Standard to an employee' })).toBeVisible();
   await page.goto('/salary-assignments');
   await page.getByTestId('assignment-employee-search').fill('PW-001');
   await page.getByTestId('search-assignment-employee').click();

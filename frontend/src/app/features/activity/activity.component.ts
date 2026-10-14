@@ -9,8 +9,9 @@ import { EmptyStateComponent } from '../../shared/empty-state.component';
 import { ServerPagedTableComponent } from '../../shared/server-paged-table.component';
 import { LoadingStateComponent } from '../../shared/loading-state.component';
 import { ErrorStateComponent } from '../../shared/error-state.component';
+import { PageGuideComponent } from '../../shared/page-guide.component';
 
-@Component({ selector: 'app-activity', standalone: true, imports: [StatusBadgeComponent, CommonModule, MatButtonModule, EmptyStateComponent, ServerPagedTableComponent, LoadingStateComponent, ErrorStateComponent], templateUrl: './activity.component.html', styleUrl: './activity.component.css', changeDetection: ChangeDetectionStrategy.OnPush })
+@Component({ selector: 'app-activity', standalone: true, imports: [StatusBadgeComponent, CommonModule, MatButtonModule, EmptyStateComponent, ServerPagedTableComponent, LoadingStateComponent, ErrorStateComponent, PageGuideComponent], templateUrl: './activity.component.html', styleUrl: './activity.component.css', changeDetection: ChangeDetectionStrategy.OnPush })
 export class ActivityComponent implements OnInit {
   private readonly api = inject(ActivityApiService);
   private readonly cdr = inject(ChangeDetectorRef);

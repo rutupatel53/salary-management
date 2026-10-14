@@ -1,6 +1,6 @@
 # Salary Management Assessment: Phased Delivery Plan
 
-**Status:** Execution tracking as of 2026-10-14. Phases 0–7 were completed earlier. Phase 7.5 adds the approved salary-template workflow and is implemented/pushed as `634c958`; Angular build and unit tests pass. Backend tests and full Playwright runs after this schema change still need a working Docker engine and Maven dependency access. Public deployment and the demo video are still pending.
+**Status:** Execution tracking as of 2026-10-14. Phases 0–7.5 are implemented. The salary-template workflow is pushed as `634c958`. Docker verification passes on PostgreSQL 16.15: all three Flyway migrations, the Java 17 backend, and the exactly 10,000-row seed. Backend JUnit passed 28 tests. The latest Angular production build and 13 unit tests pass; Playwright functional passes 13/13 and sanity passes 3/3 with the hamburger menu, icon tooltips, and page guides. Render service provisioning, public deployment, and demo video are still pending.
 
 ## Summary
 
@@ -22,7 +22,7 @@ Confirmed defaults: required employee number, name, work email, hire date, count
 | 5. Pay insights | 2.5 | Phase 4 | Done: `ea3f150` |
 | 6. Excel plus activity | 3.5 | Phases 2 and 3 | Done: `2ba0117`, `bd05935`, navigation fix `8d547ab` |
 | 7. Tests, CI, performance | 2 | Phases 2–6 | Implemented; 21 backend tests, 9 frontend tests, 16 Playwright tests pass; PostgreSQL 16 timings saved |
-| 7.5. Salary templates and direct assignment | 4 | Phases 2–7 | Implemented and pushed as `634c958`; 13 frontend tests and production build pass; backend and Playwright execution pending |
+| 7.5. Salary templates and direct assignment | 4 | Phases 2–7 | Implemented and pushed as `634c958`; backend JUnit passes; required Playwright suites pass 22/22; production build passes in Docker |
 | 8. Public deployment, demo, submission | 2 | All MUST work | Prepared; waiting for Render/Netlify account access, reviewer identity, and demo recording |
 | **Total** | **27** |  |  |
 

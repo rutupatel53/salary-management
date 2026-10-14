@@ -23,6 +23,8 @@ Record confirmed choices here so the repo preserves decisions made in chat. The 
 | 2026-10-14 | Add an activity log for employee, salary, import, and export actions. Activity screen is read-only. Without login use configured `assessment-hr-manager` actor, labeled unverified. | Record actions while preserving the no-login scope. |
 | 2026-10-14 | Use one Spring Boot app with layer-based packages and the approved Angular `core/shared/features` layout. Components do not call `HttpClient`; shared components have stable test IDs. | Reuse shared code and keep screens maintainable. |
 | 2026-10-14 | Implement small vertical slices; commit each with its unit and matching Playwright tests. After each phase report done/tests/next in three lines. | Keep progress reviewable and tests close to behavior. |
+| 2026-10-14 | UI direction updated: use a hamburger in the compact top bar to open the left side menu as an overlay on both desktop and mobile. Start closed; close after navigation, Escape, or backdrop click. | The user clarified they want a side menu controlled by a responsive hamburger on web and mobile. |
+| 2026-10-14 | Salary template row actions use icons with tooltips and accessible labels. Each feature screen provides a brief visible usage guide. | Reduce button text clutter while keeping the controls discoverable and the workflows clear. |
 
 ## Implementation record
 
