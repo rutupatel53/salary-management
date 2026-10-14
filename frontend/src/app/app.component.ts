@@ -1,10 +1,41 @@
-import { Component } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet, NavigationEnd } from '@angular/router';
+import { BreakpointObserver } from '@angular/cdk/layout';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatButtonModule } from '@angular/material/button';
+import { filter } from 'rxjs';
+import { AppIconComponent } from './shared/app-icon.component';
+import { StatusBadgeComponent } from './shared/status-badge.component';
 
 @Component({
- selector: 'app-root', standalone: true, imports: [RouterLink, RouterOutlet, MatButtonModule],
- template: `<div class="shell"><aside class="sidebar"><a class="brand" routerLink="/employees"><span class="mark">S</span> Salary management</a><nav aria-label="Main navigation"><a routerLink="/employees" routerLinkActive="active" data-testid="nav-employees">Employees</a><a routerLink="/insights" routerLinkActive="active" data-testid="nav-insights">Pay insights</a><a routerLink="/import-export" routerLinkActive="active" data-testid="nav-import-export">Import and export</a><a routerLink="/activity" routerLinkActive="active" data-testid="nav-activity">Activity</a></nav><div class="sidebar-foot">HR manager workspace<br><small>Synthetic assessment data</small></div></aside><main class="content"><header><span>People operations <b>/</b> Salary management</span><span class="actor">HR Manager</span></header><router-outlet /></main></div>`,
- styles: [`.shell{min-height:100vh;background:#f6f8fb;color:#1f2937}.sidebar{position:fixed;inset:0 auto 0 0;width:238px;background:#171b2d;color:#fff;padding:25px 16px;display:flex;flex-direction:column;gap:30px}.brand{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none;font-weight:700}.mark{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:#7565d8}.sidebar nav{display:grid;gap:8px}.sidebar nav a{padding:12px;color:#d7d9e2;text-decoration:none;border-radius:8px}.sidebar nav a.active,.sidebar nav a:hover{background:#2c3150;color:white}.sidebar nav a.disabled{opacity:.45}.sidebar-foot{margin-top:auto;font-size:.85rem;color:#d7d9e2}.sidebar-foot small{color:#aeb3c4}.content{margin-left:238px;padding:0 28px 36px}header{height:64px;border-bottom:1px solid #e7eaf0;display:flex;align-items:center;justify-content:space-between;color:#637087}header b{padding:0 8px;color:#abb2c0}.actor{border-radius:24px;background:white;padding:9px 14px;color:#30394d}@media(max-width:760px){.sidebar{position:static;width:auto;min-height:auto}.sidebar nav{display:flex;overflow:auto}.sidebar-foot{display:none}.content{margin:0;padding:0 14px}}`]
+ selector: 'app-root', standalone: true,
+ imports: [CommonModule, RouterLink, RouterLinkActive, RouterOutlet, MatSidenavModule, MatButtonModule, AppIconComponent, StatusBadgeComponent],
+ templateUrl: './app.component.html', styleUrl: './app.component.css',
+ host: { '(document:keydown.escape)': 'closeMobileNavigation()' },
+ changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AppComponent { }
+export class AppComponent {
+ readonly mobile = signal(false);
+ readonly menuOpen = signal(true);
+ readonly pageName = signal('Employees');
+ readonly links = [
+   { path: '/employees', label: 'Employees', icon: 'people', testId: 'nav-employees' },
+   { path: '/insights', label: 'Pay insights', icon: 'insights', testId: 'nav-insights' },
+   { path: '/import-export', label: 'Import & export', icon: 'file', testId: 'nav-import-export' },
+   { path: '/activity', label: 'Activity log', icon: 'activity', testId: 'nav-activity' }
+ ];
+ closeMobileNavigation(): void { if (this.mobile()) this.menuOpen.set(false); }
+ constructor() {
+   inject(BreakpointObserver).observe('(max-width: 960px)').pipe(takeUntilDestroyed()).subscribe(state => {
+     this.mobile.set(state.matches);
+     this.menuOpen.set(!state.matches);
+   });
+   inject(Router).events.pipe(filter(event => event instanceof NavigationEnd), takeUntilDestroyed()).subscribe(event => {
+     const link = this.links.find(item => event.urlAfterRedirects.startsWith(item.path));
+     this.pageName.set(link?.label || 'Workspace');
+     if (this.mobile()) this.menuOpen.set(false);
+   });
+ }
+}

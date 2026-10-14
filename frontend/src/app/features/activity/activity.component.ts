@@ -1,3 +1,4 @@
+import { StatusBadgeComponent } from '../../shared/status-badge.component';
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { finalize } from 'rxjs';
@@ -9,7 +10,7 @@ import { ServerPagedTableComponent } from '../../shared/server-paged-table.compo
 import { LoadingStateComponent } from '../../shared/loading-state.component';
 import { ErrorStateComponent } from '../../shared/error-state.component';
 
-@Component({ selector: 'app-activity', standalone: true, imports: [CommonModule, MatButtonModule, EmptyStateComponent, ServerPagedTableComponent, LoadingStateComponent, ErrorStateComponent], templateUrl: './activity.component.html', styleUrl: './activity.component.css', changeDetection: ChangeDetectionStrategy.OnPush })
+@Component({ selector: 'app-activity', standalone: true, imports: [StatusBadgeComponent, CommonModule, MatButtonModule, EmptyStateComponent, ServerPagedTableComponent, LoadingStateComponent, ErrorStateComponent], templateUrl: './activity.component.html', styleUrl: './activity.component.css', changeDetection: ChangeDetectionStrategy.OnPush })
 export class ActivityComponent implements OnInit {
   private readonly api = inject(ActivityApiService);
   private readonly cdr = inject(ChangeDetectorRef);

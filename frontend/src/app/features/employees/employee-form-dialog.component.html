@@ -36,6 +36,6 @@
   </form>
   <ng-container dialogActions>
     <button mat-button type="button" [disabled]="saving || confirming" (click)="cancel()" data-testid="cancel-employee">Cancel</button>
-    <button mat-flat-button color="primary" type="submit" form="employee-editor" [disabled]="saving" data-testid="save-employee">{{ saving ? 'Saving…' : 'Save employee' }}</button>
+    <button mat-flat-button color="primary" type="submit" form="employee-editor" [disabled]="saving" data-testid="save-employee">{{ saving ? 'Savingâ€¦' : 'Save employee' }}</button>
   </ng-container>
 </app-dialog-shell>

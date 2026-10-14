@@ -11,7 +11,7 @@ Updated: 2026-10-14
 - [x] PostgreSQL 16.15 local database passes the 10,000-row data invariants and outlier checks.
 - [x] Backend JUnit/Mockito suite passes: 28 tests, zero failures or errors.
 - [x] Angular production build and unit suite pass: 11 tests, zero failures.
-- [x] Playwright `@sanity`, selected `@functional`, and essential `@data` suites pass: 18 tests, zero failures.
+- [x] Playwright `@sanity`, selected `@functional`, and essential `@data` suites pass: 20 tests, zero failures.
 - [x] PostgreSQL 16 performance plans and timings are recorded in `docs/performance.md` and the test report.
 - [x] GitHub Actions runs tests only and uploads HTML/JUnit reports. Render and Netlify auto-deploy remain outside CI.
 - [x] Render Blueprint, Netlify configuration, setup notes, AI notes, performance notes, and demo script are committed.
@@ -24,7 +24,7 @@ Updated: 2026-10-14
 - [ ] Deliver a dedicated salary-template workspace inspired by the reference list, details, edit, copy, and history flows.
 - [ ] Replace the always-visible salary editor with a deliberate salary action and review flow.
 - [ ] Review all screens for consistent navigation, shared controls, loading, empty, and error states.
-- [ ] Visually inspect desktop and narrow-screen layouts.
+- [x] Inspect the redesigned shell and main-screen layouts at phone/tablet/desktop widths (390/768/1440px); no page-level horizontal overflow. Repeat for the new salary workspace when built.
 - [ ] Run the final regression suite against the completed UI.
 
 ## Still required before emailing the submission

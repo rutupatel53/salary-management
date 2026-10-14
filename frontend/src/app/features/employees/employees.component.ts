@@ -1,3 +1,4 @@
+import { StatusBadgeComponent } from '../../shared/status-badge.component';
 import { downloadFile } from '../../shared/download-file';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -26,7 +27,7 @@ import { firstValueFrom } from 'rxjs';
 
 @Component({
  selector: 'app-employees', standalone: true,
- imports: [CommonModule, RouterLink, FormsModule, MatButtonModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatTableModule, MatSortModule, EmptyStateComponent, FilterBarComponent, ServerPagedTableComponent, LoadingStateComponent, ErrorStateComponent],
+ imports: [StatusBadgeComponent, CommonModule, RouterLink, FormsModule, MatButtonModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatTableModule, MatSortModule, EmptyStateComponent, FilterBarComponent, ServerPagedTableComponent, LoadingStateComponent, ErrorStateComponent],
  templateUrl: './employees.component.html', styleUrl: './employees.component.css', changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EmployeesComponent implements OnInit {

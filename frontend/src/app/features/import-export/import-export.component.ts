@@ -1,3 +1,4 @@
+import { StatusBadgeComponent } from '../../shared/status-badge.component';
 import { downloadFile } from '../../shared/download-file';
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject } from '@angular/core';
@@ -14,7 +15,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { FileUploadBoxComponent } from '../../shared/file-upload-box.component';
 import { ErrorStateComponent } from '../../shared/error-state.component';
 
-@Component({ selector: 'app-import-export', standalone: true, imports: [CommonModule, FormsModule, MatButtonModule, MatFormFieldModule, MatInputModule, MatSelectModule, FileUploadBoxComponent, ErrorStateComponent], templateUrl: './import-export.component.html', styleUrl: './import-export.component.css', changeDetection: ChangeDetectionStrategy.OnPush })
+@Component({ selector: 'app-import-export', standalone: true, imports: [StatusBadgeComponent, CommonModule, FormsModule, MatButtonModule, MatFormFieldModule, MatInputModule, MatSelectModule, FileUploadBoxComponent, ErrorStateComponent], templateUrl: './import-export.component.html', styleUrl: './import-export.component.css', changeDetection: ChangeDetectionStrategy.OnPush })
 export class ImportExportComponent {
   private readonly api = inject(ImportExportApiService);
   private readonly references = inject(EmployeeApiService);

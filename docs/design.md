@@ -289,3 +289,10 @@ The root `requirements.md`, README, and other earlier project notes may still co
 ## Employee sorting and filtered export
 
 Employee list and export accept `sortBy` and `direction`. Defaults are employeeNumber and asc. Supported fields are employeeNumber, name, workEmail, hireDate, country, department, and jobTitle. EmployeeSort maps public names to trusted JPA paths and rejects unknown values with HTTP 400. Name sorts by first and last name. Every sort adds employee ID as a stable tie-breaker. Sorting and filtering occur in PostgreSQL before pagination. The directory Export view action passes its current filters and sort, and exports all matches.
+
+
+## Responsive workspace design
+
+Use a light sidebar, blue primary actions, neutral surfaces, shared SVG icons, and text-bearing status badges. Navigation highlights the active route. At 960px and below it becomes an overlay drawer with Escape and route-change closing. Main headings, cards, filters, and tables use shared theme tokens. Filters become full-width on phones. Wide tables scroll inside their own containers and leave pagination reachable.
+
+The user supplied screenshots clarifying a separate salary-template builder followed by employee CTC assignment and calculation preview. Annual/monthly CTC, component rules, employer-contribution treatment, and template version semantics are pending clarification before the schema changes. This is an open delivery gate.
