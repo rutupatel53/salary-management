@@ -180,7 +180,7 @@ All endpoints are under `/api`. Paginated endpoints cap `size` at 100 and return
 | `PUT /employees/{id}` | Edit employee fields | Same field and uniqueness checks as create; return field errors; never alter prior salary versions. |
 | `DELETE /employees/{id}` | Archive employee (soft delete) | Set `archived_at`; repeated archive is safe; preserve salary history and audit trail. |
 | `GET /employees/{id}/salary-history` | Read salary versions newest-first | 404 for unknown employee; currency and effective date included. |
-| `POST /employees/{id}/salary-history` | Append salary version | Require effective date after latest version, nonnegative amounts, supported currency, and deductions no greater than gross; PostgreSQL generates and stores gross/net. |
+| `POST /employees/{id}/salary-history` | Legacy direct append for integrations; not exposed in the HR UI | Require effective date after latest version, nonnegative amounts, employee-country currency, and deductions no greater than gross; PostgreSQL generates gross/net. The HR salary workflow uses template assignment. |
 | `GET /salary-templates` | Search and page templates | Bounded page size; optional country/status/search; stable name ordering. |
 | `POST /salary-templates` | Create a salary template | Supported country, matching configured currency, unique country/name, 1–20 valid components, exactly one basic and one balancing allowance. |
 | `PUT /salary-templates/{id}` | Revise template definition or status | Require current revision; conflict on stale edit; edits never mutate salary history. |
@@ -251,7 +251,7 @@ flowchart TD
 1. HR opens Salary templates, chooses a country and creates a short named template with basic, allowances, employer contributions, deductions, and one balancing allowance. Each component uses a fixed annual amount or a supported percentage rule.
 2. HR previews and activates the valid template. `POST /api/salary-templates` or `PUT /api/salary-templates/{id}` saves its bounded definition and audit event.
 3. HR opens Salary assignments (or uses the direct employee action), searches by name, email, or employee number, and selects an active template for that employee's country.
-4. HR enters annual CTC and effective date. `POST /api/salary-templates/assignments/preview` calculates annual and monthly figures; employer contributions are part of CTC, gross is basic plus allowances, and net is gross less employee deductions.
+4. HR enters annual CTC and effective date. `POST /api/salary-assignments/preview` calculates annual and monthly figures; employer contributions are part of CTC, gross is basic plus allowances, and net is gross less employee deductions.
 5. HR reviews the current salary context and confirms. The API revalidates the template revision and date, locks the employee row, appends the immutable salary snapshot and audit event in one transaction, then shows the updated history.
 
 ### Answer a pay question

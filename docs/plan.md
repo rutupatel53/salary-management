@@ -1,10 +1,10 @@
 # Salary Management Assessment: Phased Delivery Plan
 
-**Status:** Execution tracking as of 2026-10-14. Phases 0–7 are implemented and verified locally. Phase 8 is prepared but needs the user's Render, Netlify, and GitHub collaborator access plus a demo recording.
+**Status:** Execution tracking as of 2026-10-14. Phases 0–7 were completed earlier. Phase 7.5 adds the approved salary-template workflow and is implemented/pushed as `634c958`; Angular build and unit tests pass. Backend tests and full Playwright runs after this schema change still need a working Docker engine and Maven dependency access. Public deployment and the demo video are still pending.
 
 ## Summary
 
-The original delivery estimate was **24 focused hours**, targeting three days at eight hours per day. The user requested completion today, so MUST work takes priority and account-dependent deployment steps are prepared for immediate provisioning. The estimate is a guide, not a claim that deployment or recording is complete.
+The original delivery estimate was 23 focused hours. The salary-template workflow adds four hours, bringing the current estimate to **27 focused hours** (about 3.4 days at eight hours per day). MUST work takes priority; deployment configuration starts early, while final hosting and video steps depend on account access. Estimates are not a claim that deployment or recording is complete.
 
 The stack is Java 17, Spring Boot, Spring Data JPA, Flyway, PostgreSQL 16, standalone Angular with Angular Material and strict TypeScript, Playwright with TypeScript, and Docker Compose. Keep salary data synthetic. Use one commit per tested vertical slice. Render and Netlify configurations use provider GitHub auto-deploy; GitHub Actions runs tests only.
 
@@ -22,10 +22,11 @@ Confirmed defaults: required employee number, name, work email, hire date, count
 | 5. Pay insights | 2.5 | Phase 4 | Done: `ea3f150` |
 | 6. Excel plus activity | 3.5 | Phases 2 and 3 | Done: `2ba0117`, `bd05935`, navigation fix `8d547ab` |
 | 7. Tests, CI, performance | 2 | Phases 2–6 | Implemented; 21 backend tests, 9 frontend tests, 16 Playwright tests pass; PostgreSQL 16 timings saved |
+| 7.5. Salary templates and direct assignment | 4 | Phases 2–7 | Implemented and pushed as `634c958`; 13 frontend tests and production build pass; backend and Playwright execution pending |
 | 8. Public deployment, demo, submission | 2 | All MUST work | Prepared; waiting for Render/Netlify account access, reviewer identity, and demo recording |
-| **Total** | **24** |  |  |
+| **Total** | **27** |  |  |
 
-Day 1 is phases 0–2 (8 h). Day 2 is phases 3–5 plus a 0.5 h schedule buffer (8 h). Day 3 is phases 6–8 (7.5 h) plus a 0.5 h schedule buffer. Phase 1 deploys the thin slice; phase 8 verifies and refreshes the final deployment.
+Phase 1 prepares and deploys the thin slice early. Phases 2–7.5 add vertical slices and verification; phase 8 verifies the complete deployment, records the demo, and prepares submission.
 
 ## Hosting recommendation
 
@@ -52,8 +53,8 @@ Do not cut any of the four modules, the seed, core unit tests, the public demo, 
 - Countries are US/USD, IN/INR, GB/GBP, DE/EUR, and CA/CAD. Do not convert currencies or compare values across currencies.
 - The import workbook columns are: employee number, first name, last name, work email, hire date, country code, department, job title, currency, basic, allowances, deductions, and salary effective date.
 - Archived employees retain salary history but are excluded from normal directory results, exports, and insights. Duplicate employee numbers and case-insensitive email addresses are rejected.
-- Tables are `countries`, `departments`, `employees`, `salary_versions`, and `activity_log`. There are no salary component, import batch, or import error tables. Flyway migrations own the schema.
-- Proposed screen routes: `/employees`, `/employees/:id`, `/insights`, and `/import-export`. Add stable `data-testid` attributes as each screen is built.
+- Tables are `countries`, `departments`, `employees`, `salary_versions`, `salary_templates`, and `activity_log`. Template components and resolved salary breakdowns use validated bounded JSONB. There are no import batch or import error tables. Flyway migrations own the schema.
+- Screen routes include `/employees`, `/employees/:id`, `/salary-templates`, `/salary-assignments`, `/insights`, `/import-export`, and `/activity`. Add stable `data-testid` attributes as each screen is built.
 - Keep Playwright code in `/e2e`: `tests/`, `pages/`, fixed `fixtures/`, reset/API/report `support/`, and `playwright.config.ts`. Use `BASE_URL` and `API_URL` environment variables with local Compose defaults.
 - REST paths in the approved `docs/design.md` are the implementation contracts. Record any needed change in `docs/decisions.md` before changing a feature contract.
 - Each feature commit includes its relevant unit tests and Playwright tests. Add an `/ai` note with the prompt, any incorrect AI suggestion, and the change made.
@@ -150,17 +151,17 @@ Department maintenance is in the selected scope but the brief does not specify w
 
 ### Tasks
 
-1. **[MUST | feature] Add salary amounts and immutable history.** Store effective-dated snapshots in one row with basic, allowances, deductions, and generated gross/net. **User sees:** employee detail shows current amounts, currency, effective date, and prior versions. **API:** `GET /api/employees/{id}/salary-history`, `POST /api/employees/{id}/salary-history`. **Tables:** `salary_versions` linked to `employees`. **Screen:** `/employees/:id` Salary structure with edit form and history list. **Edge cases:** missing employee, zero values, negative inputs, deductions above gross, duplicate/backward effective date, exact two-decimal rounding, unknown currency, and transactional rollback if any amount is invalid.
-2. **[MUST | test] Verify salary calculations and change history.** **User sees:** totals and past values remain explainable after edits. **API/DB/screens:** test create/current/history contract and display. **Edge cases:** BigDecimal precision, HALF_UP boundary, zero allowances/deductions, no negative net, dates at boundary, and no mutation of old snapshots.
+1. **[MUST | feature] Add salary amounts and immutable history.** Store effective-dated snapshots in one row with basic, allowances, deductions, and generated gross/net. **User sees:** employee detail shows current amounts, currency, effective date, and prior versions; the salary action opens the central template assignment flow added in Phase 7.5. **API:** `GET /api/employees/{id}/salary-history`; `POST /api/employees/{id}/salary-history` remains for direct integrations but is not exposed as an HR editor. **Tables:** `salary_versions` linked to `employees`. **Screens:** `/employees/:id` salary history and `/salary-assignments`. **Edge cases:** missing employee, zero values, negative inputs, deductions above gross, duplicate/backward effective date, exact two-decimal rounding, unknown currency, and transactional rollback if any amount is invalid.
+2. **[MUST | test] Verify salary calculations and change history.** **User sees:** totals and past values remain explainable after assignment. **API/DB/screens:** test generated current/history contract and template assignment. **Edge cases:** BigDecimal precision, HALF_UP boundary, zero allowances/deductions, no negative net, dates at boundary, and no mutation of old snapshots.
 
 ### Tests added
 
-- **Unit:** JUnit 5/Mockito tests for `gross = basic + allowances`, `net = gross - deductions`, rounding, component validation, effective-date rules, and append-only history; Angular salary form and formatted totals tests.
-- **Playwright:** `@functional` change salary structure, verify gross/net, then verify the previous version remains in history.
+- **Unit:** JUnit 5/Mockito tests for `gross = basic + allowances`, `net = gross - deductions`, rounding, component validation, effective-date rules, and append-only history; Angular API payload and formatted totals tests.
+- **Playwright:** `@functional` assign a salary through a template, verify gross/net, then verify the previous version remains in history.
 
 ### Definition of done
 
-Salary amounts use decimal database types and `BigDecimal`. Updating salary creates a new dated snapshot. The detail screen shows computed totals and history. Invalid amounts cannot persist.
+Salary amounts use decimal database types and `BigDecimal`. Assigning salary creates a new dated snapshot. The detail screen shows computed totals and history. Invalid amounts cannot persist. Phase 7.5 supersedes the earlier idea of editing salary amounts directly on employee detail.
 
 ### Planned commit messages
 
@@ -284,6 +285,34 @@ Required workflows pass locally and in GitHub Actions. CI artifacts include an H
 ### Risks and decisions needed
 
 The `@data` suite's direct database checks need test-only credentials available in CI. Keep credentials scoped to CI secrets. If runtime is too long, run the seed/invariant checks once per data job, not before every functional test. The optional Allure history path may be fragile until there are several runs.
+
+## Phase 7.5. Salary templates and direct assignment
+
+**Estimate:** 4 h. **Depends on:** Phases 2–7. Added after the user reviewed the first salary UI and approved the template-first workflow.
+
+### Tasks
+
+1. **[MUST | feature] Add country-specific salary templates.** Create `salary_templates` with country/currency, Draft/Active/Archived status, optimistic revision, and a validated JSONB component list capped at 20. Add paged/search routes `GET/POST /api/salary-templates` and `PUT /api/salary-templates/{id}`. Build a responsive template screen with status badges and a short component editor for fixed, percent-of-CTC, percent-of-basic, and one balancing allowance. **User sees:** reusable rules can be created, copied, edited, and activated once per country. **Tables:** `salary_templates`, `countries`, `activity_log`. **Screens:** `/salary-templates`. **Edge cases:** duplicate names per country, unsupported country, missing/duplicate basic, missing/multiple balance, duplicate component names, >20 components, invalid percentages, stale revision, and archived templates cannot be assigned.
+2. **[MUST | feature] Add direct salary assignment.** Add `POST /api/salary-assignments/preview` and `POST /api/salary-assignments`. Build an employee-first workflow with searchable employee identity, a country-compatible active template, annual CTC, effective date, previous salary context, monthly/yearly breakdown, and confirmation. Lock employee/template rows and revalidate on save. **User sees:** salary can be assigned from one workspace without opening employee records one by one; employee rows/details also provide a shortcut. **Tables:** `employees`, `salary_templates`, `salary_versions`, `activity_log`; salary versions retain template ID/name/revision and resolved annual/monthly breakdown JSONB. **Screens:** `/salary-assignments`, employee detail/history, insights. **Edge cases:** archived/missing employee, wrong country/currency, stale preview, date before hire or not after latest version, excessive fixed/percentage amounts, negative balance, negative net, concurrent assignments, and rounding differences between annual/monthly totals.
+3. **[MUST | test] Cover calculation and assignment contracts.** Add JUnit tests for CTC, employer contributions, deductions, rounding, negative net, balance, and invalid templates; add Vitest tests for versioned preview and template create API payloads; add Playwright tests for create/assign, stale revisions/country mismatch, and immutable snapshots. **User sees:** deterministic regression coverage for the updated salary process. **API/DB/screens:** template and assignment endpoints, generated `gross`/`net`, and template/employee screens. **Edge cases:** tests use fixed `PW-` fixtures and reset before each run; only `@data` relies on the full seed.
+4. **[MUST | docs] Preserve the approved decisions.** Update requirements, architecture, `AGENTS.md`, AI note, README, decisions, plan, demo script, and submission checklist. **User sees:** all project notes agree about country-specific templates and immutable snapshots. **API/DB/screens:** document actual route paths, six-table schema, salary screens, and formulas. **Edge cases:** no manual salary editor remains in the user flow; do not mark unrun backend or Playwright checks as passing.
+
+### Tests added
+
+- **Unit:** calculation unit tests were added. Vitest passes 13 frontend tests. Backend Maven tests are not executable in the current environment because required dependencies are not cached and Maven Central DNS fails.
+- **Playwright:** tests cover template assignment and snapshot immutability. Playwright discovers 22 tests; functional/data suites still need execution against PostgreSQL 16.
+
+### Definition of done
+
+Template and assignment screens are in the Angular production build; templates and salary versions use the migration-backed JSONB snapshots; calculations reject invalid CTC/net; employee list/detail provide direct assignment shortcuts; docs preserve the approved decision; relevant unit and Playwright tests are committed with the feature. Backend and E2E execution remain a release gate.
+
+### Planned commit messages
+
+- Completed: `feat: add reusable salary templates and direct assignment` (`634c958`, pushed to `master`).
+
+### Risks and decisions needed
+
+Annual and monthly independently rounded values can differ when multiplied by twelve; show both labels and balance each period separately. The schema migration and database locking behavior have not yet run locally because Docker's PostgreSQL engine is unavailable. Rerun backend tests and Playwright functional/data suites before marking final regression complete.
 
 ## Phase 8. Final deployment, demo, and submission
 

@@ -13,7 +13,7 @@ An HR salary-management web app for 10,000 fictional employees across five count
 ## Product modules
 
 1. Employee, department, and country directory
-2. Salary structures and append-only effective-dated history
+2. Country-specific salary templates, direct employee assignment by annual CTC, previewed monthly/yearly breakdowns, and append-only effective-dated history
 3. Stateless Excel preview/validation, atomic create-only import, and filtered export
 4. Currency-separated pay insights and role outliers
 5. Read-only activity log
@@ -38,7 +38,7 @@ Open `http://localhost:4200`; the API health route is `http://localhost:8080/api
 
 ## Tests
 
-Backend unit tests use JUnit 5 and Mockito. Angular unit tests use the Angular CLI supported runner. Playwright runs from `/e2e`, with environment variables `BASE_URL` and `API_URL`. CI runs tests and saves reports; deploys are handled by Render and Netlify GitHub auto-deploy.
+Backend unit tests use JUnit 5 and Mockito. Angular unit tests use Vitest with Angular TestBed. Playwright runs from `/e2e`, with environment variables `BASE_URL` and `API_URL`. CI runs tests and saves reports; deploys are handled by Render and Netlify GitHub auto-deploy.
 
 Install dependencies and run the suites from their project folders:
 

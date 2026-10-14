@@ -1,5 +1,7 @@
 # AI work note: salary templates and direct assignment
 
+Related commit: `634c958`
+
 ## Prompt and user direction
 
 The user reviewed the first UI and asked for a responsive redesign, less sidebar emphasis, a calmer color system, visible status badges, and a procedure-based salary workflow. The reference screenshots showed a salary-template builder and a separate assignment flow. The user clarified that HR should not have to open every employee record to update salary. They approved annual CTC, fixed amounts and percentages of CTC/basic, one balancing allowance, employer contributions included in CTC, country-specific templates, immutable salary snapshots, and a concise preview-before-confirm flow.

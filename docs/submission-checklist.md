@@ -2,6 +2,8 @@
 
 Updated: 2026-10-14
 
+Post-template verification for commit `634c958`: Angular production build passes and all 13 frontend unit tests pass. Playwright discovers 22 tests, but the full suite has not been run after the template migration. Backend Maven tests and local database checks are pending: Docker Desktop cannot connect to its engine, and this environment cannot resolve Maven Central. Do not treat this final regression gate as complete until CI or a working local PostgreSQL/Maven setup verifies it.
+
 ## Ready in the repository
 
 - [x] One-page requirements document is under 400 words.
@@ -21,10 +23,11 @@ Updated: 2026-10-14
 
 - [x] Verify employee add/edit modals, field errors, discard confirmation, and focus restoration (9 functional tests; desktop/mobile modal screenshots inspected).
 - [x] Add server-side sorting with clear table controls and regression tests. List and export share the same sort allowlist.
-- [ ] Deliver a dedicated salary-template workspace inspired by the reference list, details, edit, copy, and history flows.
-- [ ] Replace the always-visible salary editor with a deliberate salary action and review flow.
+- [x] Deliver a dedicated salary-template workspace with country-specific Draft/Active/Archived status, component editing, copy, and validation.
+- [x] Replace per-employee salary editing with searchable direct assignment, annual CTC entry, preview, confirmation, and immutable salary history. Keep a direct shortcut from employee list/detail.
 - [ ] Review all screens for consistent navigation, shared controls, loading, empty, and error states.
-- [x] Inspect the redesigned shell and main-screen layouts at phone/tablet/desktop widths (390/768/1440px); no page-level horizontal overflow. Repeat for the new salary workspace when built.
+- [x] Inspect the redesigned shell and main-screen layouts at phone/tablet/desktop widths (390/768/1440px); no page-level horizontal overflow.
+- [ ] Inspect the salary-template and assignment screens at phone/tablet/desktop widths and confirm no page-level horizontal overflow.
 - [ ] Run the final regression suite against the completed UI.
 
 ## Still required before emailing the submission
