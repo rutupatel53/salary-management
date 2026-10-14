@@ -200,6 +200,8 @@ Columns: employee number, first name, last name, work email, hire date, country 
 
 ## UI screens and navigation
 
+Template filters use simple white rounded input/select controls with labels above the border. Search, status, and the Search button are all 48px high and share the same bottom edge. Their desktop grid stacks at 760px. Use the shared `.form-control` styling for this field variant; preserve native keyboard interaction and accessible label associations.
+
 ```mermaid
 flowchart TD
     APP[App shell and primary navigation]

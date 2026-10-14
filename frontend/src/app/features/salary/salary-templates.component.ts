@@ -5,9 +5,6 @@ import { RouterLink } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
 import { PageEvent } from '@angular/material/paginator';
 import { EmployeeApiService } from '../employees/employee-api.service';
 import { ReferenceCountry } from '../employees/employee.models';
@@ -18,7 +15,7 @@ import { TemplateEditorComponent } from './template-editor.component';
 import { AppIconComponent } from '../../shared/app-icon.component';
 import { PageGuideComponent } from '../../shared/page-guide.component';
 
-@Component({selector:'app-salary-templates',standalone:true,imports:[CommonModule,FormsModule,RouterLink,MatButtonModule,MatTooltipModule,MatFormFieldModule,MatInputModule,MatSelectModule,StatusBadgeComponent,ServerPagedTableComponent,AppIconComponent,PageGuideComponent],templateUrl:'./salary-templates.component.html',styleUrl:'./salary-workspace.css',changeDetection:ChangeDetectionStrategy.OnPush})
+@Component({selector:'app-salary-templates',standalone:true,imports:[CommonModule,FormsModule,RouterLink,MatButtonModule,MatTooltipModule,StatusBadgeComponent,ServerPagedTableComponent,AppIconComponent,PageGuideComponent],templateUrl:'./salary-templates.component.html',styleUrl:'./salary-workspace.css',changeDetection:ChangeDetectionStrategy.OnPush})
 export class SalaryTemplatesComponent {
  private readonly api=inject(SalaryWorkspaceApiService);
  private readonly references=inject(EmployeeApiService);

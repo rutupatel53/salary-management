@@ -66,6 +66,30 @@ h3 { font-size: 14px; font-weight: 600; }
 .card p { color: var(--muted); font-size: 12px; line-height: 1.65; }
 
 /* Consistent Angular Material form controls across every feature. */
+.form-control { display: grid; gap: 8px; min-width: 0; }
+.form-control > label { color: #475569; font-size: 12px; font-weight: 600; line-height: 18px; }
+.form-control input,
+.form-control select {
+  width: 100%;
+  min-width: 0;
+  height: 48px;
+  padding: 0 14px;
+  border: 1px solid #d8e0eb;
+  border-radius: 9px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+  transition: border-color .16s ease, box-shadow .16s ease;
+}
+.form-control input::placeholder { color: #8a96a8; font-weight: 400; }
+.form-control input:hover,
+.form-control select:hover { border-color: #a5b5c9; }
+.form-control input:focus,
+.form-control select:focus { outline: none; border-color: var(--primary); box-shadow: var(--focus-ring); }
+.input-with-icon { position: relative; min-width: 0; }
+.input-with-icon input { padding-left: 42px; }
+.input-with-icon > app-icon { position: absolute; left: 14px; top: 14px; color: #8997aa; pointer-events: none; }
 .mat-mdc-form-field { max-width: 100%; font-size: 13px; }
 .mat-mdc-form-field-infix { min-height: 48px; padding-top: 12px !important; padding-bottom: 12px !important; }
 .mat-mdc-form-field-subscript-wrapper { font-size: 11px; }

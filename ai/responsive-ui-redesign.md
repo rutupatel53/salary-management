@@ -17,9 +17,13 @@ The initial shell used a desktop sidebar and mobile drawer. The user asked for a
 
 ## What the AI got wrong
 
+The prior attempt kept Material's border-cut labels and a 40px button beside taller fields. The user clarified that the actual controls must have equal height and that they dislike that field variant. Template filters now use separate labels and simple rounded white controls; both fields and Search are exactly 48px high, bottom-aligned in one desktop row.
+
 I treated “responsive” as permission to keep a persistent desktop sidebar, then briefly replaced it with horizontal top navigation after interpreting the feedback too broadly. The user's latest instruction specifies the interaction: hamburger opens a side menu on web and mobile. I have implemented that interaction and saved it as the current decision.
 
 ## Verification
+
+- Simple template filter controls: production build passes; browser measurements at 1038px confirm both fields and Search are 48px tall with identical top/bottom coordinates. At 390px, controls stack with equal widths and no page overflow. Search and status filtering were exercised in the running UI and restored afterward.
 
 - PostgreSQL 16.15, Java 17 API, and Angular UI run locally in Docker.
 - Flyway applied all three migrations; the deterministic seed contains exactly 10,000 employees.
