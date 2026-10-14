@@ -86,3 +86,12 @@ Render's free PostgreSQL tier is temporary and the free API may sleep. Use the p
 The submission includes this repository, a public synthetic-data deployment, test/report artifacts, committed design and AI notes, and a demo video. The repository is private; grant reviewer access before sharing its link.
 
 Track remaining external setup in [`docs/submission-checklist.md`](docs/submission-checklist.md). Use [`docs/demo-script.md`](docs/demo-script.md) to record the public walkthrough after deployment and CI verification.
+
+## Reviewer documents and demo
+
+- [Product overview](docs/submission-overview.md), with a [shareable PDF](output/pdf/Salary%20Management%20Assessment%20Overview.pdf).
+- [Technical guide](docs/technical-guide.md), with a [PDF covering architecture, schema, APIs, salary rules, tests, and setup](output/pdf/Salary%20Management%20Technical%20Guide.pdf).
+- [Demo transcript](docs/demo-transcript.md) and [two-minute walkthrough](docs/demo-script.md).
+- [Submission checklist](docs/submission-checklist.md) and [email reply draft](docs/submission-email.md).
+
+The recorded demo uses the local application and fictional records, with narration and captions. Its MP4 is a separate submission attachment. Public app and video sharing URLs must be added after deployment and upload are verified. The PDFs describe the verified application at `1dc488e`; the subsequent Docker ignore fix does not change feature behavior.
