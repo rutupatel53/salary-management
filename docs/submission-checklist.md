@@ -9,9 +9,9 @@ Updated: 2026-10-14
 - [x] Java/Spring/PostgreSQL backend and Angular UI cover people, salary history, Excel, pay insights, and activity.
 - [x] The deterministic seed generator creates 10,000 fictional employees with 200 people in each of 50 outlier groups.
 - [x] PostgreSQL 16.15 local database passes the 10,000-row data invariants and outlier checks.
-- [x] Backend JUnit/Mockito suite passes: 25 tests, zero failures or errors.
+- [x] Backend JUnit/Mockito suite passes: 28 tests, zero failures or errors.
 - [x] Angular production build and unit suite pass: 11 tests, zero failures.
-- [x] Playwright `@sanity`, selected `@functional`, and essential `@data` suites pass: 16 tests, zero failures.
+- [x] Playwright `@sanity`, selected `@functional`, and essential `@data` suites pass: 18 tests, zero failures.
 - [x] PostgreSQL 16 performance plans and timings are recorded in `docs/performance.md` and the test report.
 - [x] GitHub Actions runs tests only and uploads HTML/JUnit reports. Render and Netlify auto-deploy remain outside CI.
 - [x] Render Blueprint, Netlify configuration, setup notes, AI notes, performance notes, and demo script are committed.
@@ -20,7 +20,7 @@ Updated: 2026-10-14
 ## Product UI readiness gates
 
 - [x] Verify employee add/edit modals, field errors, discard confirmation, and focus restoration (9 functional tests; desktop/mobile modal screenshots inspected).
-- [ ] Add server-side sorting with clear table controls and regression tests.
+- [x] Add server-side sorting with clear table controls and regression tests. List and export share the same sort allowlist.
 - [ ] Deliver a dedicated salary-template workspace inspired by the reference list, details, edit, copy, and history flows.
 - [ ] Replace the always-visible salary editor with a deliberate salary action and review flow.
 - [ ] Review all screens for consistent navigation, shared controls, loading, empty, and error states.

@@ -60,3 +60,29 @@ test('@functional employee modal validates required fields and confirms discarde
   await expect(dialog).toHaveCount(0);
   await expect(page.getByTestId('add-employee')).toBeFocused();
 });
+
+
+test('@functional employee sort stays on the server and preserves search', async ({ page, request }) => {
+  await page.goto('/employees');
+  await page.getByTestId('employee-search').fill('ACME-IN-');
+  await page.getByTestId('employee-search').press('Enter');
+  await expect(page.locator('[data-testid^="employee-row-"]').first()).toContainText('ACME-IN-');
+  const responsePromise = page.waitForResponse(response => response.url().includes('/api/employees?') && response.url().includes('direction=desc'));
+  await page.getByTestId('sort-employeeNumber').click();
+  const response = await responsePromise;
+  const body = await response.json();
+  expect(body.data.items.length).toBeGreaterThan(0);
+  expect(body.data.items.every((employee: { employeeNumber: string }) => employee.employeeNumber.startsWith('ACME-IN-'))).toBe(true);
+  const numbers = body.data.items.map((employee: { employeeNumber: string }) => employee.employeeNumber);
+  expect(numbers).toEqual([...numbers].sort().reverse());
+  await expect(page.locator('[data-testid^="employee-row-"]').first()).toContainText(numbers[0]);
+  await expect(page.getByTestId('sort-employeeNumber')).toHaveAttribute('aria-sort', 'descending');
+  const downloadPromise = page.waitForEvent('download');
+  const exportResponse = page.waitForResponse(response => response.url().includes('/employees/export'));
+  await page.getByTestId('export-employee-view').click();
+  expect((await exportResponse).url()).toContain('direction=desc');
+  expect((await downloadPromise).suggestedFilename()).toBe('salary-management-employees.xlsx');
+  const badSort = await request.get(`${apiURL}/employees`, { params: { sortBy: 'unknown' } });
+  expect(badSort.status()).toBe(400);
+  expect((await badSort.json()).status).toBe(400);
+});

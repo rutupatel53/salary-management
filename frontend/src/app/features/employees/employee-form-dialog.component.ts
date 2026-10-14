@@ -52,7 +52,7 @@ export class EmployeeFormDialogComponent {
   });
   saving = false;
   error = '';
-  private confirming = false;
+  confirming = false;
 
   constructor() {
     if (this.data.employee) {
@@ -73,6 +73,7 @@ export class EmployeeFormDialogComponent {
         title: 'Discard changes?', message: 'Your unsaved employee changes will be lost.', confirmLabel: 'Discard changes'
       }));
       this.confirming = false;
+      this.cdr.markForCheck();
       if (!discard) return;
     }
     this.dialog.close();

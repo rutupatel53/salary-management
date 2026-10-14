@@ -1,5 +1,7 @@
 package com.acme.salary.service;
 
+import com.acme.salary.dto.EmployeeSort;
+
 import com.acme.salary.audit.AuditService;
 import com.acme.salary.model.Employee;
 import com.acme.salary.repository.EmployeeRepository;
@@ -8,7 +10,6 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import com.acme.salary.repository.SalaryExportRepository;
 import com.acme.salary.repository.SalaryExportRepository.SalaryExport;
 import org.springframework.stereotype.Service;
@@ -40,7 +41,7 @@ public class EmployeeExportServiceImpl implements EmployeeExportService {
 
     @Override
     @Transactional
-    public byte[] export(String query, String country, UUID departmentId, String jobTitle) {
+    public byte[] export(String query, String country, UUID departmentId, String jobTitle, EmployeeSort sort) {
         var specification = EmployeeSpecifications.active().and(
                 EmployeeSpecifications.filters(query, country, departmentId, jobTitle));
         try (SXSSFWorkbook workbook = new SXSSFWorkbook(100);
@@ -53,7 +54,7 @@ public class EmployeeExportServiceImpl implements EmployeeExportService {
             for (int pageNumber = 0; ; pageNumber++) {
                 var page = employeeRepository.findAll(specification, PageRequest.of(
                         pageNumber, EXPORT_PAGE_SIZE,
-                        Sort.by("employeeNumber").ascending().and(Sort.by("id").ascending())));
+                        sort.toSort()));
                 if (page.isEmpty()) {
                     break;
                 }

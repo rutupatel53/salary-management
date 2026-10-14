@@ -2,6 +2,7 @@ package com.acme.salary.service;
 
 import com.acme.salary.audit.AuditService;
 import com.acme.salary.dto.EmployeeRequest;
+import com.acme.salary.dto.EmployeeSort;
 import com.acme.salary.dto.EmployeeResponse;
 import com.acme.salary.dto.PageResponse;
 import com.acme.salary.exception.ConflictException;
@@ -15,7 +16,6 @@ import com.acme.salary.repository.DepartmentRepository;
 import com.acme.salary.repository.EmployeeRepository;
 import com.acme.salary.specification.EmployeeSpecifications;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,9 +48,9 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     @Transactional(readOnly = true)
     public PageResponse<EmployeeResponse> list(
-            String query, String country, UUID departmentId, String jobTitle, int page, int size) {
+            String query, String country, UUID departmentId, String jobTitle, int page, int size, EmployeeSort sort) {
         var pageable = PageRequest.of(page, size,
-                Sort.by("employeeNumber").ascending().and(Sort.by("id").ascending()));
+                sort.toSort());
         var employees = employeeRepository.findAll(
                 EmployeeSpecifications.active().and(
                         EmployeeSpecifications.filters(query, country, departmentId, jobTitle)),

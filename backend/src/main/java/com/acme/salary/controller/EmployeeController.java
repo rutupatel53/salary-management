@@ -2,6 +2,7 @@ package com.acme.salary.controller;
 
 import com.acme.salary.dto.ApiResponse;
 import com.acme.salary.dto.EmployeeRequest;
+import com.acme.salary.dto.EmployeeSort;
 import com.acme.salary.dto.EmployeeResponse;
 import com.acme.salary.dto.PageResponse;
 import com.acme.salary.service.EmployeeExportService;
@@ -45,10 +46,12 @@ public class EmployeeController {
             @RequestParam(required = false) String department,
             @RequestParam(required = false) String jobTitle,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "25") int size) {
+            @RequestParam(defaultValue = "25") int size,
+            @RequestParam(defaultValue = "employeeNumber") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction) {
         validatePagination(page, size);
         return ApiResponse.success(HttpStatus.OK.value(),
-                employeeService.list(q, country, parseDepartment(department), jobTitle, page, size),
+                employeeService.list(q, country, parseDepartment(department), jobTitle, page, size, new EmployeeSort(sortBy, direction)),
                 "Employees retrieved.");
     }
 
@@ -62,8 +65,10 @@ public class EmployeeController {
             @RequestParam(required = false) String q,
             @RequestParam(required = false) String country,
             @RequestParam(required = false) String department,
-            @RequestParam(required = false) String jobTitle) {
-        byte[] workbook = exportService.export(q, country, parseDepartment(department), jobTitle);
+            @RequestParam(required = false) String jobTitle,
+            @RequestParam(defaultValue = "employeeNumber") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction) {
+        byte[] workbook = exportService.export(q, country, parseDepartment(department), jobTitle, new EmployeeSort(sortBy, direction));
         return ResponseEntity.ok()
                 .contentType(XLSX)
                 .header(HttpHeaders.CONTENT_DISPOSITION,

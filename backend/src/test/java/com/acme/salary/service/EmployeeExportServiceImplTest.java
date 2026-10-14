@@ -52,7 +52,7 @@ class EmployeeExportServiceImplTest {
             return ((ResultSetExtractor) invocation.getArgument(1)).extractData(rs);
         }).when(jdbc).query(anyString(), any(ResultSetExtractor.class), any(Object[].class));
 
-        byte[] file = new EmployeeExportServiceImpl(employees, new com.acme.salary.repository.SalaryExportRepository(jdbc), audit).export("EMP-001", "US", null, null);
+        byte[] file = new EmployeeExportServiceImpl(employees, new com.acme.salary.repository.SalaryExportRepository(jdbc), audit).export("EMP-001", "US", null, null, new com.acme.salary.dto.EmployeeSort("employeeNumber", "asc"));
         try (var workbook = new XSSFWorkbook(new ByteArrayInputStream(file))) {
             var row = workbook.getSheetAt(0).getRow(1);
             assertEquals("100000000.01", row.getCell(9).getStringCellValue());

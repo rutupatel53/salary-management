@@ -13,4 +13,5 @@ export class EmployeeApiService {
   update(id: string, value: EmployeeRequest) { return this.api.put<ApiResponse<Employee>>(`/employees/${id}`, value); }
   archive(id: string) { return this.api.delete<ApiResponse<null>>(`/employees/${id}`); }
   get(id:string) { return this.api.get<ApiResponse<Employee>>(`/employees/${id}`); }
+  export(filters: Record<string, string | number>) { return this.api.download('/employees/export', filters); }
 }

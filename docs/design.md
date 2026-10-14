@@ -284,3 +284,8 @@ The root `requirements.md`, README, and other earlier project notes may still co
 - Import parsing necessarily iterates workbook cells. It is limited to 500 rows and uses bulk identity checks. Export iterates pages of 500 records and writes a streaming workbook. These loops do not replace database filters.
 - Keep constructor injection and centralized exception advice. JSON error status matches HTTP status, including HTTP 413 for multipart uploads over the configured limit. Downloads retain their binary response type.
 - Local server version checked: PostgreSQL 16.15. Compose, CI, and Render configuration target major version 16.
+
+
+## Employee sorting and filtered export
+
+Employee list and export accept `sortBy` and `direction`. Defaults are employeeNumber and asc. Supported fields are employeeNumber, name, workEmail, hireDate, country, department, and jobTitle. EmployeeSort maps public names to trusted JPA paths and rejects unknown values with HTTP 400. Name sorts by first and last name. Every sort adds employee ID as a stable tie-breaker. Sorting and filtering occur in PostgreSQL before pagination. The directory Export view action passes its current filters and sort, and exports all matches.
