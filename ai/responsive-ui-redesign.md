@@ -24,4 +24,4 @@ I treated “responsive” as permission to keep a persistent desktop sidebar, t
 - Backend JUnit: 28 tests pass. Angular Vitest: 13 tests pass.
 - Required Playwright suites: 22 tests pass with zero failures.
 - Salary template and assignment screens were checked at 390, 768, and 1440px with no page overflow or browser errors.
-- Latest icon and page-guide changes are pending a fresh Angular and Playwright run.
+- Latest verification: Angular production build succeeded; 13 unit tests passed; Playwright functional passed 13/13 and sanity passed 3/3. The Escape-key close behavior was made explicit after the first desktop test exposed a failure.

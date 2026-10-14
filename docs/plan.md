@@ -1,6 +1,6 @@
 # Salary Management Assessment: Phased Delivery Plan
 
-**Status:** Execution tracking as of 2026-10-14. Phases 0–7.5 are implemented. The salary-template workflow is pushed as `634c958`. Docker verification passes on PostgreSQL 16.15: all three Flyway migrations, the Java 17 backend, and the exactly 10,000-row seed. Backend JUnit passed 28 tests. The latest Angular production build and 13 unit tests pass; Playwright functional passes 13/13 and sanity passes 3/3 with the hamburger menu, icon tooltips, and page guides. Render service provisioning, public deployment, and demo video are still pending.
+**Status:** Execution tracking as of 2026-10-14. Phases 0–7.5 are implemented. The salary-template workflow is pushed as `634c958`; responsive navigation and page guidance are pushed as `11db78b`. Docker verification passes on PostgreSQL 16.15: all three Flyway migrations, the Java 17 backend, and the exactly 10,000-row seed. Backend JUnit passed 28 tests. The latest Angular production build and 13 unit tests pass; Playwright functional passes 13/13 and sanity passes 3/3 with the hamburger menu, icon tooltips, and page guides. Render service provisioning, public deployment, and demo video are still pending.
 
 ## Summary
 
