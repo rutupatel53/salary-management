@@ -3,9 +3,8 @@ WORKDIR /workspace
 COPY package*.json ./
 RUN npm ci
 COPY . .
-ARG NG_APP_API_BASE=/api
-ENV NG_APP_API_BASE=${NG_APP_API_BASE}
-RUN npm run build
+ARG BUILD_CONFIGURATION=production
+RUN npm run build -- --configuration=${BUILD_CONFIGURATION}
 
 FROM build AS unit-tests
 RUN npm test

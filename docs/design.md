@@ -1,5 +1,9 @@
 # Salary Management Architecture
 
+## Production API configuration (15 October 2026)
+
+The Angular production build replaces `src/environments/environment.ts` with `environment.production.ts`. The production `apiUrl` is the deployed Render API selected by the user. `ApiBaseService` reads this value for every JSON request, upload, and download. Feature services supply relative endpoint paths only. Development and local Docker Compose use `/api` through their existing local proxies. Production calls Render directly; the former generated runtime-config override and Netlify API proxy are removed. Render must allow the deployed frontend origin through its existing `FRONTEND_ORIGIN` setting.
+
 ## Goal and boundaries
 
 Build a small, public, synthetic-data app that helps an HR manager maintain employee salary records and answer pay questions for a 10,000-person, multi-country organization. Use a Java 17 Spring Boot modular monolith, PostgreSQL, Flyway, and a standalone Angular app with Angular Material and strict TypeScript. Run PostgreSQL locally with Docker Compose. Host the API and database on Render and the static UI on Netlify.

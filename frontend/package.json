@@ -2,7 +2,7 @@
   "name": "salary-management-ui",
   "version": "1.0.0",
   "private": true,
-  "scripts": { "start": "ng serve --proxy-config proxy.conf.json", "prebuild": "node scripts/write-runtime-config.mjs", "build": "ng build", "test": "vitest run" },
+  "scripts": { "start": "ng serve --proxy-config proxy.conf.json", "build": "ng build", "test": "vitest run" },
   "dependencies": {
     "@angular/animations": "22.2.2", "@angular/common": "22.2.2", "@angular/compiler": "22.2.2",
     "@angular/core": "22.2.2", "@angular/forms": "22.2.2", "@angular/platform-browser": "22.2.2", "@angular/router": "22.2.2",

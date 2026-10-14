@@ -12,7 +12,7 @@
         "build": {
           "builder": "@angular/build:application",
           "options": { "outputPath": "dist/salary-management", "index": "src/index.html", "browser": "src/main.ts", "polyfills": ["zone.js"], "tsConfig": "tsconfig.app.json", "styles": ["src/styles.css"], "assets": [{ "glob": "**/*", "input": "public", "output": "/" }] },
-          "configurations": { "production": { "optimization": true, "outputHashing": "all", "budgets": [{ "type": "initial", "maximumWarning": "650kB", "maximumError": "1MB" }] }, "development": { "optimization": false, "extractLicenses": false, "sourceMap": true } },
+          "configurations": { "production": { "fileReplacements": [{ "replace": "src/environments/environment.ts", "with": "src/environments/environment.production.ts" }], "optimization": true, "outputHashing": "all", "budgets": [{ "type": "initial", "maximumWarning": "650kB", "maximumError": "1MB" }] }, "development": { "optimization": false, "extractLicenses": false, "sourceMap": true } },
           "defaultConfiguration": "production"
         },
         "serve": { "builder": "@angular/build:dev-server", "configurations": { "production": { "buildTarget": "salary-management:build:production" }, "development": { "buildTarget": "salary-management:build:development" } }, "defaultConfiguration": "development" },
