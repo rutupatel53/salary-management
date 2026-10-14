@@ -26,6 +26,7 @@ Record confirmed choices here so the repo preserves decisions made in chat. The 
 | 2026-10-14 | UI direction updated: use a hamburger in the compact top bar to open the left side menu as an overlay on both desktop and mobile. Start closed; close after navigation, Escape, or backdrop click. | The user clarified they want a side menu controlled by a responsive hamburger on web and mobile. |
 | 2026-10-14 | Salary template row actions use icons with tooltips and accessible labels. Each feature screen provides a brief visible usage guide. | Reduce button text clutter while keeping the controls discoverable and the workflows clear. |
 | 2026-10-14 | Standardize Angular Material form fields and buttons with shared dimensions, typography, borders, hover/focus feedback, and mobile wrapping. Keep template row action icons in one horizontal group. | Make controls feel consistent and usable across every feature instead of relying on unrelated local styles. |
+| 2026-10-14 | Keep field labels persistently above controls; lay out page-guide steps as equal columns on desktop and stacked rows on mobile; align template filters in one grid row until the mobile breakpoint. | Remove placeholder-like labels and uneven spacing while preserving a compact, responsive workflow. |
 
 ## Implementation record
 

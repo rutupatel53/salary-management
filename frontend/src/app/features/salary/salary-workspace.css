@@ -7,6 +7,17 @@
   flex-wrap: wrap;
 }
 
+.template-filters {
+  display: grid;
+  grid-template-columns: minmax(280px, 1.2fr) minmax(220px, .8fr) auto;
+  align-items: center;
+  gap: 16px;
+  margin: 12px 0 18px;
+}
+.template-filters mat-form-field { width: 100%; min-width: 0; }
+.template-filters > button { align-self: center; min-width: 96px; }
+.field-prefix { width: 18px; height: 18px; margin-right: 8px; color: var(--muted); }
+
 .section-toolbar {
   justify-content: space-between;
   margin: 12px 0;
@@ -106,6 +117,11 @@ td.actions .mat-mdc-icon-button { flex: 0 0 40px; }
   .assignment-grid { grid-template-columns: 1fr; }
   .component-editor > button { justify-self: end; }
   .totals { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 760px) {
+  .template-filters { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .template-filters > button { justify-self: start; }
 }
 
 @media (max-width: 500px) {

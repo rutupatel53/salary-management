@@ -65,6 +65,7 @@ Components never call `HttpClient` directly. Feature API services use the core A
 - Feature screens include a short visible “How to use this page” guide with practical steps.
 - Table actions that use icons include a tooltip and an accessible name; icon-only controls must remain keyboard reachable.
 - Use the shared form and button tokens for control height, typography, borders, hover, focus, disabled, and responsive states.
+- Keep form labels persistently above controls, use equal-grid spacing for multi-step guidance, and keep filter fields aligned on one desktop row before stacking on narrow screens.
 - Keep the theme restrained: neutral surfaces, blue primary actions, and badges only for useful status or currency labels.
 
 ## Data and product rules
