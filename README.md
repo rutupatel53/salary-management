@@ -2,6 +2,15 @@
 
 An HR salary-management web app for 10,000 fictional employees across five countries. The approved product scope and system design are in [`docs/requirements.md`](docs/requirements.md) and [`docs/design.md`](docs/design.md). The original assessment is preserved in [`docs/assessment-brief.md`](docs/assessment-brief.md).
 
+## Live assessment
+
+- Frontend: https://superlative-blancmange-ebe430.netlify.app
+- API: https://salary-management-1vd3.onrender.com
+- Health: https://salary-management-1vd3.onrender.com/api/health
+- Final verification results, failures, and pending checks: [`docs/final-verification.md`](docs/final-verification.md).
+
+The first request after inactivity can take about a minute while the Render free service wakes up. The public demo contains fictional data only. Credentials shown for local Compose and tests are public local-development defaults, not production credentials.
+
 ## Stack
 
 - Java 17, Spring Boot, Spring Data JPA, Flyway, PostgreSQL
@@ -45,6 +54,16 @@ docker compose up --build
 
 Open `http://localhost:4200`; the API health route is `http://localhost:8080/api/health`. Flyway creates the schema and reference rows, then Compose loads the deterministic 10,000-person synthetic dataset. The smaller Playwright fixture set remains separate and its reset endpoint is available only in this local setup.
 
+### Seed command
+
+Compose enables the Java seed runner automatically. To run that same deterministic seed as a one-off local command:
+
+```sh
+docker compose run --rm -e APP_SEED_ENABLED=true salary-api --spring.main.web-application-type=none
+```
+
+The runner uses fixed UUID v5 IDs and conflict-safe inserts; it does not overwrite existing salaries. The application reads `APP_SEED_ENABLED`, not `APP_SEED_ON_STARTUP`. After the hosted seed is confirmed, set `APP_SEED_ENABLED=false` in Render. Keep `APP_TEST_TOOLS_ENABLED=false` in production. See the [production verification instructions](docs/production-verification.md) for read-only SQL and exact curl checks.
+
 ## Tests
 
 Backend unit tests use JUnit 5 and Mockito. Angular unit tests use Vitest with Angular TestBed. Playwright runs from `/e2e`, with environment variables `BASE_URL` and `API_URL`. CI runs tests and saves reports; deploys are handled by Render and Netlify GitHub auto-deploy.
@@ -80,6 +99,16 @@ Deployment is configured for GitHub auto-deploy. CI is test-only.
 4. The repository is private. Add the assessment reviewer as a GitHub collaborator before sharing the repository URL. Do not add real employee or salary data.
 
 Render's free PostgreSQL tier is temporary and the free API may sleep. Use the published app promptly for the assessment demo; check the current provider limits before provisioning.
+
+## Known limits
+
+- No login or authorization. Use synthetic records only; the audit actor is a fixed, unverified demo identity.
+- Never combine currency totals. Insights group by currency; there is no exchange-rate conversion.
+- Countries and departments are seeded reference lists. There is no department administration screen.
+- Excel imports create only and accept at most 500 rows and 5 MB per file. Export reads database pages but returns the final workbook as a byte array.
+- Render Free PostgreSQL expires 30 days after creation. Record the database's actual expiry date in Render and keep the assessment link available for reviewers. The free API can sleep, adding about a minute to the first request. [Provider limits](https://render.com/docs/free).
+- The public health endpoint is `/api/health`. Actuator is not installed, so `/actuator/health` returns 404 too.
+- Current functional fixtures require a test-only reset route. They run in local/CI environments; they cannot pass unchanged against production with reset disabled. The final review records this limitation and the stale runtime-config sanity assertion explicitly. Allure history and full tagged HR journeys remain deferred.
 
 ## Submission
 

@@ -2,7 +2,7 @@
 
 Updated: 2026-10-15
 
-Verification through 2026-10-15: PostgreSQL 16.15, the Java 17 API, and Angular UI run locally in an isolated Compose project. All three Flyway migrations pass; the deterministic seed has exactly 10,000 generated employees. GitHub Actions at application commit `1dc488e` passed 33 backend tests, 17 Angular tests, and 23 Playwright tests. The later Docker context fix `5b4bbca` was built locally and pushed. A two-minute narrated local demo is recorded. The user is completing Render and Netlify deployment; public verification is pending.
+Final verification on 2026-10-15: the deployed frontend and API are reachable; live API/export count is 10,000 active employees. Fresh checks passed 33 backend tests, 17 Angular tests, the production build, four isolated local PostgreSQL data tests, and the read-only SQL script locally. Production Playwright is not green: 20 executed, 5 passed, 15 failed, none skipped; three production SQL tests were excluded pending user-run SQL results. Fourteen failures require the protected reset route and one sanity check expects a removed runtime-config file. Production SQL, the actual seed flag, and controlled restart evidence remain pending. See [the final report](final-verification.md); historical CI evidence below is not the current hosted result.
 
 ## Ready in the repository
 
@@ -41,8 +41,12 @@ Verification through 2026-10-15: PostgreSQL 16.15, the Java 17 API, and Angular 
 
 ## Still required before emailing the submission
 
-- [ ] Finish the Render API service using the existing database or a paired Blueprint, then confirm public health and the 10,000-person generated seed.
-- [ ] Confirm the connected Netlify site's public UI, actual Render `/api` proxy target, import, and export.
+- [ ] Return the labelled production results from [`scripts/verify-production.sql`](../scripts/verify-production.sql).
+- [ ] Confirm `APP_SEED_ENABLED=false` and complete the controlled restart checks in [`production-verification.md`](production-verification.md).
+- [ ] Resolve or disclose current hosted test-harness failures and the `/actuator/health` path difference. Do not enable the reset route in production.
+
+- [x] Public API health and active ACME seed count respond successfully; all-history SQL checks remain separate and pending.
+- [x] Netlify routes, direct Render API calls, employee search, insights, and filtered export load. Write/import-confirm workflows remain unverified by hosted fixture-dependent tests.
 - [ ] Confirm the final pushed GitHub Actions run is green and download its report artifact. The verified application run is already green.
 - [ ] Upload the prepared demo file to an accessible sharing location. It is explicitly a local recording; optionally record the same flow on the public app.
 - [ ] Add the assessment reviewer as a collaborator because the repository is private.
@@ -50,4 +54,4 @@ Verification through 2026-10-15: PostgreSQL 16.15, the Java 17 API, and Angular 
 
 ## Environment verification limits
 
-Local verification used Docker Compose with PostgreSQL 16.15. Performance timings are local warm-cache measurements, not hosted guarantees. The demo file exists locally at `output/demo/Salary Management Demo.mp4`; it lasts exactly 120 seconds and uses an offline synthetic voice. The video binary and test reports are submission artifacts rather than Git content. Public deployment, hosted smoke checks, video sharing, reviewer access, and sending the email remain handover actions.
+Local verification used isolated PostgreSQL 16.15. Performance timings are local warm-cache measurements, not hosted guarantees. The demo file exists locally at `output/demo/Salary Management Demo.mp4`; it lasts exactly 120 seconds and uses an offline synthetic voice. The video binary and generated test reports are submission artifacts rather than Git content. Production SQL and restart confirmation, hosted write-workflow verification, video sharing, reviewer access, and sending the email remain handover actions.

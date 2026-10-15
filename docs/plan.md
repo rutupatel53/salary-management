@@ -1,6 +1,6 @@
 # Salary Management Assessment: Phased Delivery Plan
 
-**Status:** Execution tracking as of 2026-10-15. Phases 0–7.5 are implemented. The salary-template workflow is pushed as `634c958`; responsive navigation and page guidance are pushed as `11db78b`. Docker verification passes on PostgreSQL 16.15: all three Flyway migrations, the Java 17 backend, and the exactly 10,000-row seed. Backend JUnit passed 28 tests. The latest shared text-field/dropdown migration passes the Angular production build, 17 unit tests, and Playwright functional 14/14. The earlier sanity run passed 3/3. Render service provisioning, public deployment, and demo video are still pending.
+**Status:** Final verification on 2026-10-15 at application commit `2f747d3`: the public Netlify UI and Render API are reachable; the live active count and export contain 10,000 employees. Fresh runs passed 33 backend tests, 17 Angular tests, the production build, and four local PostgreSQL API/data tests. A narrated two-minute local demo and reviewer documents are prepared. The production Playwright run is not green: 20 executed, 5 passed, 15 failed, with three direct-SQL tests excluded pending user-supplied SQL output. Fourteen failures require the correctly disabled reset route; one sanity assertion expects a removed runtime-config file. Production SQL and seed-setting/restart verification remain pending. See [the final report](final-verification.md). This status supersedes historical per-phase test counts and execution gates below.
 
 ## Summary
 
@@ -15,15 +15,15 @@ Confirmed defaults: required employee number, name, work email, hire date, count
 | Phase | Estimate (hours) | Dependency | Completion |
 |---|---:|---|---|
 | 0. Docs and scaffold | 0.5 | Existing repo | Done: `1837b00`, plus approved design commits |
-| 1. Foundation and thin-slice hosting | 3.5 | Phase 0 | Code done: `d11a706`; hosting configured, provider deployment not yet run |
-| 2. People and departments | 4 | Phase 1 | Done: `326edfd` |
+| 1. Foundation and thin-slice hosting | 3.5 | Phase 0 | Code done: `d11a706`; final Netlify/Render deployment now reachable |
+| 2. People and departments | 4 | Phase 1 | Employee maintenance done: `326edfd`; departments/countries are read-only references |
 | 3. Salary and history | 3 | Phase 2 | Done: `42bfd62` |
 | 4. Deterministic 10,000-person seed | 2 | Phase 3 | Done: `bd9f462` |
 | 5. Pay insights | 2.5 | Phase 4 | Done: `ea3f150` |
 | 6. Excel plus activity | 3.5 | Phases 2 and 3 | Done: `2ba0117`, `bd05935`, navigation fix `8d547ab` |
-| 7. Tests, CI, performance | 2 | Phases 2–6 | Implemented; 21 backend tests, 9 frontend tests, 16 Playwright tests pass; PostgreSQL 16 timings saved |
-| 7.5. Salary templates and direct assignment | 4 | Phases 2–7 | Implemented and pushed as `634c958`; backend JUnit passes; required Playwright suites pass 22/22; production build passes in Docker |
-| 8. Public deployment, demo, submission | 2 | All MUST work | Prepared; waiting for Render/Netlify account access, reviewer identity, and demo recording |
+| 7. Tests, CI, performance | 2 | Phases 2–6 | 33 backend / 17 frontend tests and build pass; local PostgreSQL checks pass; production suite gaps remain |
+| 7.5. Salary templates and direct assignment | 4 | Phases 2–7 | Implemented as `634c958`; current unit/build checks pass; production reset-dependent journeys remain unverified |
+| 8. Public deployment, demo, submission | 2 | All MUST work | Live URLs and local video ready; production SQL, restart setting, reviewer access and final submission need confirmation |
 | **Total** | **27** |  |  |
 
 Phase 1 prepares and deploys the thin slice early. Phases 2–7.5 add vertical slices and verification; phase 8 verifies the complete deployment, records the demo, and prepares submission.
@@ -118,6 +118,8 @@ Local Compose starts PostgreSQL and the API; Flyway runs on an empty DB; the Ang
 This is the earliest deploy and should use the Render DB only shortly before submission due to its 30-day expiry. Hosting access, service region, environment variables, and cross-origin configuration can block the estimate. Use synthetic data only.
 
 ## Phase 2. People and departments
+
+**Delivery note:** The original task below included `POST /api/departments` and `/employees/new`. These were not delivered: department/country APIs are read-only reference lists, and employee creation/editing uses a dialog on the directory. Do not count department administration as complete. This difference is retained explicitly rather than rewriting the original requirement.
 
 **Estimate:** 4 h. **Depends on:** Phase 1.
 

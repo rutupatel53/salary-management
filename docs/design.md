@@ -12,6 +12,8 @@ The four modules are people/departments, salary templates and assignments/histor
 
 ## System architecture
 
+**Verification note (15 October 2026):** Public health is the custom `/api/health` controller. Actuator is not installed; `/actuator/health` and sampled management endpoints return 404. Current repository unit tests use mocks; separate local API/data tests compare real PostgreSQL queries. The hosted test/reset limitations and pending production SQL are listed in [the final verification report](final-verification.md).
+
 ```mermaid
 flowchart LR
     HR[HR manager]
@@ -286,7 +288,7 @@ flowchart TD
 
 Write an activity event for employee create/update/archive, salary change, successful import, and successful export. Record actor identifier, action, timestamp, optional employee target, and a small JSON summary (changed field names or row count/filter summary). Do not duplicate salary amounts in audit JSON because salary versions already preserve them. The Activity screen is read-only. Do not expose update/delete activity endpoints; append log entries in the same transaction as successful writes. Preview attempts and failed exports/imports may be omitted from the log for the lean first version.
 
-There is no login, so the app cannot prove a human identity. For the synthetic public demo, the suggested default is one server-configured actor identifier, `assessment-hr-manager`, shown as a demo identity. This records which app actor performed each action, not a verified real-world person. Keep this limitation explicit; do not use the public demo with real compensation data.
+There is no login, so the app cannot prove a human identity. The current AuditService uses the fixed actor identifier `assessment-hr-manager`, shown as a demo identity. It does not read `APP_ACTOR`. This is not a verified real-world person. Keep this limitation explicit; do not use the public demo with real compensation data.
 
 ## Key trade-offs
 
@@ -302,7 +304,7 @@ There is no login, so the app cannot prove a human identity. For the synthetic p
 
 ## Confirmed design decisions
 
-- The audit actor is a server-configured `assessment-hr-manager` demo identity. It is labeled as unverified because role-based login is out of scope.
+- The audit actor is the fixed `assessment-hr-manager` demo identity. It is labeled as unverified because role-based login is out of scope.
 - New salary versions must use the employee country’s configured currency. Each salary snapshot stores its currency.
 - A new salary effective date must be later than the latest version. One version per employee per effective date.
 - Outliers are grouped by job title, country, and currency everywhere. Use IQR and require at least five salaries in each group.
